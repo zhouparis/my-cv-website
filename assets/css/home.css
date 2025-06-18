@@ -1,0 +1,37 @@
+.home_page section + section {
+  margin-top: 3rem;
+  border-top: 1px solid #e0e0e0; padding-top: 2rem; 
+  /* remove or customize border if you like: */
+  /* border-top: 1px solid #e0e0e0; */
+}
+
+.main-content .cv-section h2 {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.5rem;
+  margin: 1.2rem 0 0.5rem;
+}
+
+.main-content .cv-section p,
+.main-content .cv-section ul {
+  margin: 0.4rem 0;
+  line-height: 1.5;
+}
+
+.main-content .cv-section li {
+  margin: 0.4rem 0;
+}
+
+.main-content .links,
+.main-content .contact,
+.main-content .job-history,
+.main-content .education {
+  border-top: 1px solid #ccc;
+  padding-top: 0.5rem;
+  margin-top: 0.3rem;
+}
+
+footer {
+  margin-top: 2rem;        /* pushes it further down */
+  padding-top: 1.5rem;     /* adds inner space above its content */
+  border-top: 1px solid #e0e0e0;  /* optional separator line */
+}
