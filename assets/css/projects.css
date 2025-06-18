@@ -1,0 +1,36 @@
+.projects-page .project-window {
+  /* make the window wider */
+  max-width: 1200px;
+  width: 100%;
+  padding: 1.5em;      
+  border-radius: 10px; 
+  margin: 2rem auto;
+  background: #f9f9f9;
+}
+
+/* increase tab container height so no content gets clipped */
+.projects-page .tab-container {
+  position: relative;
+  min-height: 500px;
+  overflow: visible;
+}
+
+
+.projects-page .tab-content {
+  position: relative;
+  top: auto; left: auto;
+  right: auto; 
+  transform: none;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transition: none;
+  display: none;
+}
+.projects-page .tab-content.active {
+  display: block;
+}
+
+.projects-page .tab-content.active > * {
+  animation: fadeIn 0.4s ease-in forwards;
+}

@@ -1,0 +1,47 @@
+/* assets/css/about.css */
+
+/* Override the global flex layout on this page */
+.about-page main {
+  display: block;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  line-height: 1.6;
+}
+
+/* Center the photo, keep rectangular shape */
+.about-page .profile-photo {
+  text-align: center;
+  margin: 2rem 0;
+}
+.about-page img.profile-pic {
+  width: 180px;          /* adjust as desired */
+  height: auto;
+  object-fit: cover;
+  border: 2px solid #000;
+  border-radius: 0 !important;
+  box-shadow: none;
+}
+
+/* Reset section spacing (if you don’t want the global border) */
+.about-page section {
+  margin-bottom: 2rem;
+  padding-top: 0;
+  border-top: none;
+}
+
+.about-page section + section {
+  margin-top: 3rem;
+  border-top: 1px solid #e0e0e0; padding-top: 2rem; 
+  /* remove or customize border if you like: */
+  /* border-top: 1px solid #e0e0e0; */
+}
+
+/* Footer and header can keep the global styles unless you want to tweak them here */
+.about-page footer {
+  text-align: center;
+  padding: 1.5rem 0;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  background: linear-gradient(135deg, #257e89, #4f9da6);
+}
