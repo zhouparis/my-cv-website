@@ -15,8 +15,7 @@ aside {
   background: #fdebff;
   border: 2px solid #ddd;
   padding: 1rem;
-  border-radius: 8px;
-  position: sticky;
+  border-radius: 0px;
   top: 2rem;
   align-self: flex-start;
 }
@@ -89,9 +88,18 @@ nav a:hover {
 }
 
 main {
-  max-width: 900px;
-  margin: 2.5rem auto;
-  padding: 0 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.sidebar {
+  flex: 0 0 250px;        /* fixed width */
+  top: 1rem;              /* adjust to exactly below your header */
+}
+/* main content area */
+.main-content {
+  flex: 1;                /* fill remaining space */
 }
 
 .cv-section,
