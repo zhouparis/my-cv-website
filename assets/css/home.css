@@ -35,3 +35,26 @@ footer {
   padding-top: 1.5rem;     /* adds inner space above its content */
   border-top: 1px solid #e0e0e0;  /* optional separator line */
 }
+
+.education-item {
+  /* ensure the bar has room */
+  padding-left: 1rem;
+  /* optional: space between items */
+  margin-bottom: 2rem;
+  /* establish positioning context */
+  position: relative;
+}
+
+.education-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* thickness of the accent bar */
+  width: 4px;
+  /* span full height of the item */
+  height: 100%;
+  /* use your accent variable */
+  background: var(--accent);
+  border-radius: 2px;
+}

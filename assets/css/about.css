@@ -31,8 +31,8 @@
 }
 
 .about-page section + section {
-  margin-top: 3rem;
-  border-top: 1px solid #e0e0e0; padding-top: 2rem; 
+  margin-top: 1rem;
+  border-top: 2px solid #e0e0e0; padding-top: 0rem; 
   /* remove or customize border if you like: */
   /* border-top: 1px solid #e0e0e0; */
 }
