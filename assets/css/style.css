@@ -20,6 +20,64 @@ aside {
   align-self: flex-start;
 }
 
+h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  /* responsive sizing: min 2rem, scales with viewport up to 3.5rem */
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: #a6bcd3;             /* dark slate for good contrast */
+  text-align: center;         /* center it (optional) */
+  margin: 1rem 0 0.5rem;      /* plenty of breathing room */
+  letter-spacing: 1px;        /* subtle tracking */
+}
+
+/* 2. Add a decorative underline */
+h1::after {
+  content: '';
+  display: block;
+  width: 180px;
+  height: 4px;
+  background: #cdeae5;        /* accent color */
+  margin: 0.5rem auto 0;
+  border-radius: 2px;
+}
+
+/* 3. (Optional) Soft text-shadow for depth */
+h1 {
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+
+h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  color: #728eab;
+  margin: 1.5rem 0 0.75rem;
+  position: relative;
+
+}
+
+/* 2. Subtle hover color shift */
+a:hover {
+  color: #1abc9c;
+  cursor: default;
+}
+
+/* 3. Alternative: dotted underline */
+.alt-underline {
+  padding-bottom: 0.25rem;
+}
+.alt-underline::after {
+  content: '';
+  display: block;
+  width: 50px;
+  margin-top: 0.25rem;
+  border-bottom: 2px dotted #18bc9c;
+}
+
+
+
 .skills ul {
   list-style: none;
   padding: 0;
@@ -54,7 +112,7 @@ body {
 }
 
 header {
-  background: linear-gradient(135deg, #4f9da6, #257e89);
+  background: linear-gradient(to bottom, #257e89, #6eadb4);
   color: white;
   padding: 1.5rem 1rem;
   text-align: center;
@@ -108,7 +166,7 @@ main {
 }
 
 footer {
-  background: linear-gradient(135deg, #257e89, #4f9da6);
+  background: linear-gradient(to top, #257e89, #4f9da6);
   color: white;
   text-align: center;
   padding: 1.5rem 1rem;
