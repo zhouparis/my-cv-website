@@ -38,14 +38,48 @@
       background: #ddd;
     }
 
+    .tab-container {
+      position: relative;
+      min-height: 300px;
+      overflow: hidden; /* Ensures hidden tabs don’t overflow */
+    }
+
+    .tab-container .tab-content.active {
+      display: block !important;
+      opacity: 1       !important;
+      pointer-events: auto !important;
+      transform: translateY(0) !important;
+    }
+
     .tab-content {
-      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px);
+      transition: transform 0.4s ease, opacity 0.4s ease;
+      z-index: 0;
     }
 
     .tab-content.active {
-      display: block;
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+      z-index: 1;
+    }
+
+    .tab-content > * {
+      animation: fadeIn 0.4s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
   </style>
+
 </head>
 <body>
   <header>
@@ -67,29 +101,55 @@
         <button class="tab-btn" onclick="openTab(event, 'project5')">DS&A</button>
       </div>
 
-      <div class="tab-content active" id="project1">
-        <h2>Artificial Life Simulation (Senior Capstone)</h2>
-        <p>The A-Life Challenge Simulation is an artificial life ecosystem I'm developing with teammates in Python to study the emergence of complex behaviors from simple biological principles...</p>
-        <p>Organisms are defined by a robust genomic structure—including morphological, metabolic, reproductive, and locomotion traits—that dictate their survival strategies...</p>
-      </div>
+      <div class="tab-container">
+        <div class="tab-content active" id="project1">
+          <h2>Artificial Life Simulation (Senior Capstone)</h2>
+          <p>The A-Life Challenge Simulation is an artificial life ecosystem I'm developing with teammates in Python to study the emergence of complex behaviors from simple biological principles...</p>
+          <p>Organisms are defined by a robust genomic structure—including morphological, metabolic, reproductive, and locomotion traits—that dictate their survival strategies...</p>
+        </div>
 
-      <div class="tab-content" id="project2">
-        <h2>Database-Driven Website</h2>
-        <p>Created a Node.js/Express website powered by a MySQL database for the mock business "AwesomeCarDealer"...</p>
-        <p>Integrated dynamic lookup endpoints for front-end dropdowns (e.g., fetching customers by name, vehicle VINs)...</p>
-      </div>
+        <div class="tab-content" id="project2">
+          <h2>Database-Driven Website</h2>
+          <p>Created a Node.js/Express website powered by a MySQL database for the mock business "AwesomeCarDealer"...</p>
+          <p>Integrated dynamic lookup endpoints for front-end dropdowns (e.g., fetching customers by name, vehicle VINs)...</p>
+        </div>
 
-      <div class="tab-content" id="project3">
-        <h2>Small Shell (Command-Line Interpreter)</h2>
-        <p>Custom Unix Shell (zpshell): Designed and implemented a command-line interpreter in C with support for parsing up to 2,048-character inputs and 512 arguments...</p>
-        <p>Enabled I/O redirection, background execution with &, /dev/null fallbacks, and real-time notifications of background job completions...</p>
-      </div>
+        <div class="tab-content" id="project3">
+          <h2>Small Shell (Command-Line Interpreter)</h2>
+          <p>Custom Unix Shell (zpshell): Designed and implemented a command-line interpreter in C with support for parsing up to 2,048-character inputs and 512 arguments...</p>
+          <p>Enabled I/O redirection, background execution with &, /dev/null fallbacks, and real-time notifications of background job completions...</p>
+        </div>
 
-      <div class="tab-content" id="project4">
-        <h2>Campus Network Security Architecture</h2>
-        <p>Designed a multi-layer defense blueprint for all campuses, blending network segmentation, DDoS mitigation, and controlled research/partner connectivity...</p>
-        <p>Designed two-step login for all users, staff education on avoiding common scams, protected stored passwords, and active session monitoring...</p>
-      </div>
+        <div class="tab-content" id="project4">
+          <h2>Campus Network Security Architecture</h2>
+          <p>Designed a multi-layer defense blueprint for all campuses, blending network segmentation, DDoS mitigation, and controlled research/partner connectivity...</p>
+          <p>Designed two-step login for all users, staff education on avoiding common scams, protected stored passwords, and active session monitoring...</p>
+        </div>
 
-      <div class="tab-content" id="project5">
-        <h2>Data
+        <div class="tab-content" id="project5">
+          <h2>Data Structures & Algorithms Collection</h2>
+          <p>Developed a comprehensive GitHub collection of Python programs showcasing implementations of core data structures...</p>
+          <p>Authored thorough unit tests and clear documentation to ensure code robustness, readability, and maintainability...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; Paris Zhou — 2025</p>
+  </footer>
+
+  <script>
+    function openTab(evt, tabId) {
+      const target = document.getElementById(tabId);
+      if (!target) return;
+
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+      target.classList.add('active');
+      evt.currentTarget.classList.add('active');
+    }
+  </script>
+</body>
+</html>
