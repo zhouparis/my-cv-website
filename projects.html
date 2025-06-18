@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="assets/css/projects.css" />
 
 </head>
-<body>
+<body class="projects-page">
   <header>
     <h1>Projects</h1>
     <nav>
@@ -31,8 +31,68 @@
       <div class="tab-container">
         <div class="tab-content active" id="project1">
           <h2>Artificial Life Simulation (Senior Capstone)</h2>
-          <p>The A-Life Challenge Simulation is an artificial life ecosystem I'm developing with teammates in Python to study the emergence of complex behaviors from simple biological principles. Using NumPy for vectorized computations and PyGame for real-time visualization, the simulation models a dynamic environment where virtual organisms evolve, interact, and adapt to ecological pressures. Designed to enable large-scale parallel computation, supporting thousands of simultaneous agents within the ecosystem.</p>
+          <p>The A-Life Challenge Simulation is an artificial life ecosystem I'm developed with two other Oregon State University students. It's a Python program that can be used to study the emergence of complex behaviors from simple biological principles. Using NumPy for vectorized computations and PyGame for real-time visualization, the simulation models a dynamic environment where virtual organisms evolve, interact, and adapt to ecological pressures. Designed to enable large-scale parallel computation, supporting thousands of simultaneous agents within the ecosystem.</p>
           <p>Organisms are defined by a robust genomic structure—including morphological, metabolic, reproductive, and locomotion traits—that dictate their survival strategies. Evolutionary adaptation is driven by controlled probabilistic mutation, resulting in genetic drift and speciation over time. I implemented efficient spatial indexing with cKDTree for rapid neighbor detection and built a lineage tracker to map parent-child relationships and visualize evolutionary paths. This project highlights my expertise in Python, genetic modeling, and high-performance computing.</p>
+
+          <div class="project-video">
+            <iframe
+              src="https://vimeo.com/1089955892/0ee0c9a246"
+              width="640" height="360"
+              frameborder="0"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowfullscreen>
+            </iframe>
+          </div>
+
+          <h2>GitHub Repository</h2>
+          <p><a href="https://github.com/AnthonyPrudent/A-Life-Challenge">https://github.com/AnthonyPrudent/A-Life-Challenge</a></p>
+
+          <h2>Requirements</h2>
+          <ul>
+            <li>Python 3.10 or later</li>
+            <li>pip</li>
+            <li><a href="assets\images\a-life-sim\requirements.txt">requirements.txt</a></li>
+          </ul>
+
+          <h2>Installation</h2>
+          <ol>
+            <li>Clone the repository from GitHub.</li>
+            <li>Open a terminal and navigate to the cloned folder.</li>
+            <li>Install dependencies:
+              <pre><code>pip install -r requirements.txt</code></pre>
+              <p>If <code>pip</code> is not installed, use <code>python -m pip install -r requirements.txt</code>.</p>
+            </li>
+          </ol>
+
+          <h2>Running the Simulation</h2>
+          <ol>
+            <li>Start the main menu:
+              <pre><code>python menu.py</code></pre>
+            </li>
+            <li>At the menu, set initial organisms, environment size, and mutation rate, then click <strong>Start</strong>.
+              <p>We recommend no more than 5000 organisms or environment size above 1400.</p>
+            </li>
+          </ol>
+
+          <h2>Usage</h2>
+          <p><strong>Statistics</strong> (generations, population, births, deaths, energy, species legend) appear on the left.</p>
+          <figure>
+            <img src="assets/images/a-life-sim/main-menu.png" alt="Image of main menu">
+            <figcaption>Image of the main menu</figcaption>
+          </figure>
+
+          <h2>Controls</h2>
+          <ul>
+            <li><strong>Pause/Start</strong> – Toggle the simulation.</li>
+            <li><strong>Save</strong> – Save state as a pickle file.</li>
+            <li><strong>Load</strong> – Load a saved pickle file.</li>
+            <li><strong>Skip</strong> – Advance 50 generations by default.</li>
+            <li><strong>Custom Organism</strong> – Enter genome values and spawn organisms.</li>
+            <li><strong>Meteor, Radioactive Wave, Drought, Flood</strong> – Trigger hazards.</li>
+            <li><strong>Print Tree</strong> – Export ancestry tree as PNG and .nwk files.</li>
+            <li><strong>FPS Slider</strong> – Adjust simulation speed.</li>
+          </ul>
+        
         </div>
 
         <div class="tab-content" id="project2">
