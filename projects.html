@@ -5,6 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Projects</title>
   <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    .project-window {
+      border: 1px solid #ccc;
+      padding: 1em;
+      max-width: 960px;
+      margin: auto;
+      background: #f9f9f9;
+      border-radius: 10px;
+    }
+
+    .tab-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5em;
+      margin-bottom: 1em;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 0.5em;
+      background: #eee;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+
+    .tab-btn:hover,
+    .tab-btn.active {
+      background: #ddd;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -16,42 +57,39 @@
     </nav>
   </header>
 
-  <main class="project-list">
+  <main>
+    <div class="project-window">
+      <div class="tab-buttons">
+        <button class="tab-btn active" onclick="openTab(event, 'project1')">A-Life Sim</button>
+        <button class="tab-btn" onclick="openTab(event, 'project2')">Database Site</button>
+        <button class="tab-btn" onclick="openTab(event, 'project3')">Small Shell</button>
+        <button class="tab-btn" onclick="openTab(event, 'project4')">NetSec Arch</button>
+        <button class="tab-btn" onclick="openTab(event, 'project5')">DS&A</button>
+      </div>
 
-    <article>
-      <h2>Artificial Life Simulation (Senior Capstone)</h2>
-      <p>The A-Life Challenge Simulation is an artificial life ecosystem I'm developing with teammates in Python to study the emergence of complex behaviors from simple biological principles. Using NumPy for vectorized computations and PyGame for real-time visualization, the simulation models a dynamic environment where virtual organisms evolve, interact, and adapt to ecological pressures. Designed to enable large-scale parallel computation, supporting thousands of simultaneous agents within the ecosystem.</p>
-      <p>Organisms are defined by a robust genomic structure—including morphological, metabolic, reproductive, and locomotion traits—that dictate their survival strategies. Evolutionary adaptation is driven by controlled probabilistic mutation, resulting in genetic drift and speciation over time. I implemented efficient spatial indexing with cKDTree for rapid neighbor detection and built a lineage tracker to map parent-child relationships and visualize evolutionary paths.</p>
-    </article>
+      <div class="tab-content active" id="project1">
+        <h2>Artificial Life Simulation (Senior Capstone)</h2>
+        <p>The A-Life Challenge Simulation is an artificial life ecosystem I'm developing with teammates in Python to study the emergence of complex behaviors from simple biological principles...</p>
+        <p>Organisms are defined by a robust genomic structure—including morphological, metabolic, reproductive, and locomotion traits—that dictate their survival strategies...</p>
+      </div>
 
-    <article>
-      <h2>Database-Driven Website</h2>
-      <p>Created a Node.js/Express website powered by a MySQL database for the mock business "AwesomeCarDealer". Designed a fully normalized MySQL schema splitting composite keys to streamline warranty handling. Authored DDL scripts with auto-increment keys, precise data types, and foreign-key constraints to preserve referential integrity during deletes and updates.</p>
-      <p>Integrated dynamic lookup endpoints for front-end dropdowns (e.g., fetching customers by name, vehicle VINs), eliminating manual ID entry and improving UX. Compiled a polished PDF report featuring an executive summary of schema iterations, updated ERD/schema diagrams, and annotated CRUD screenshots.</p>
-    </article>
+      <div class="tab-content" id="project2">
+        <h2>Database-Driven Website</h2>
+        <p>Created a Node.js/Express website powered by a MySQL database for the mock business "AwesomeCarDealer"...</p>
+        <p>Integrated dynamic lookup endpoints for front-end dropdowns (e.g., fetching customers by name, vehicle VINs)...</p>
+      </div>
 
-    <article>
-      <h2>Small Shell (Command-Line Interpreter)</h2>
-      <p>Custom Unix Shell (zpshell): Designed and implemented a command-line interpreter in C with support for parsing up to 2,048-character inputs and 512 arguments, handling comments/blank lines, and executing both built-in (exit, cd, status) and external commands via fork(), exec(), and waitpid().</p>
-      <p>Enabled I/O redirection, background execution with &, /dev/null fallbacks, and real-time notifications of background job completions. Integrated robust signal handling to ignore SIGINT in the shell, deliver SIGINT to foreground child processes, and toggle “foreground-only” mode on SIGTSTP (Ctrl-Z) with user-friendly status messages.</p>
-    </article>
+      <div class="tab-content" id="project3">
+        <h2>Small Shell (Command-Line Interpreter)</h2>
+        <p>Custom Unix Shell (zpshell): Designed and implemented a command-line interpreter in C with support for parsing up to 2,048-character inputs and 512 arguments...</p>
+        <p>Enabled I/O redirection, background execution with &, /dev/null fallbacks, and real-time notifications of background job completions...</p>
+      </div>
 
-    <article>
-      <h2>Campus Network Security Architecture</h2>
-      <p>Designed a multi-layer defense blueprint for all campuses, blending network segmentation, DDoS mitigation, and controlled research/partner connectivity to thwart unauthorized scans and intrusions. Created an intelligent monitoring framework featuring selective SSL/TLS decryption, finely tuned IDS/IPS rules, honeypots, and a centralized SIEM to surface covert channels and beacon traffic.</p>
-      <p>Designed two-step login for all users, staff education on avoiding common scams, protected stored passwords, and active session monitoring to shut down any takeovers. Created clear documentation including network maps, an executive summary, and a risk-acceptance chart justifying each security measure.</p>
-    </article>
+      <div class="tab-content" id="project4">
+        <h2>Campus Network Security Architecture</h2>
+        <p>Designed a multi-layer defense blueprint for all campuses, blending network segmentation, DDoS mitigation, and controlled research/partner connectivity...</p>
+        <p>Designed two-step login for all users, staff education on avoiding common scams, protected stored passwords, and active session monitoring...</p>
+      </div>
 
-    <article>
-      <h2>Data Structures & Algorithms Collection</h2>
-      <p>Developed a comprehensive GitHub collection of Python programs showcasing implementations of core data structures (linked lists, stacks, queues, binary search trees, heaps, graphs) and algorithms (DFS, BFS, merge sort, quick sort, Dijkstra’s shortest path), demonstrating deep understanding of algorithmic problem-solving and complexity trade-offs.</p>
-      <p>Authored thorough unit tests and clear documentation to ensure code robustness, readability, and maintainability, adhering to industry best practices in software design and version control.</p>
-    </article>
-
-  </main>
-
-  <footer>
-    <p>&copy; Paris Zhou — 2025</p>
-  </footer>
-</body>
-</html>
+      <div class="tab-content" id="project5">
+        <h2>Data

@@ -38,3 +38,38 @@ footer {
   bottom: 0;
   width: 100%;
 }
+
+
+.project-window {
+  border: 1px solid #ccc;
+  padding: 1em;
+  width: 90%;
+  max-width: 800px;
+  margin: auto;
+  background: #f9f9f9;
+  border-radius: 10px;
+}
+
+.tab-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1em;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 0.5em;
+  background: #eee;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.tab-btn:hover,
+.tab-btn.active {
+  background: #ddd;
+}
+
+.tab-content {
+  display: none;
+}
