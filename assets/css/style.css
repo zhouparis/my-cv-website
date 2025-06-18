@@ -1,6 +1,30 @@
 /* 1. Import a modern font */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap&display=swap');
 
+@media (prefers-color-scheme: dark) {
+  :root { color-scheme: light dark; }
+  body { /* set dark by default if no override */ }
+  body[data-theme]:not([data-theme="light"]) { /* do nothing if already set */ }
+}
+:root {
+  --bg: #f0f4f8;
+  --text: #2a3d4f;
+  --accent: #4f9da6;
+}
+
+[data-theme="dark"] {
+  --bg: #4a3636;
+  --text: #e0e0e0;
+  --accent: #18bc9c;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s, color 0.3s;
+}
+
+
 :root {
   /* Color palette */
   --bg-light: #f0f4f8;
