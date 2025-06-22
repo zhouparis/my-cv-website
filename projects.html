@@ -9,14 +9,8 @@
 
 </head>
 <body class="projects-page">
-  <header>
-    <h1>Projects</h1>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="projects.html">Projects</a>
-      <a href="about.html">About</a>
-    </nav>
-  </header>
+  <div data-include="partials/header.html"></div>
+  <h1>Projects</h1>
 
   <main>
     <div class="project-window">
@@ -119,6 +113,7 @@
           <p>Designed an intelligent monitoring framework featuring selective SSL/TLS decryption, finely tuned IDS/IPS rules, honeypots, and a centralized SIEM to surface covert channels and beacon traffic.</p>
           <p>Strong Access Controls: Designed two-step login for all users, staff education on avoiding common scams, protected stored passwords, and active session monitoring to shut down any takeovers.</p>
           <p>Clear Documentation & Risk Plan: Created easy-to-follow network maps, an executive summary, and a risk-acceptance chart that explains why each security measure was chosen.</p>
+          <p>Download the report <a href="assets\files\Campus Network Security Solution.pdf">here</a>.</p>
         </div>
 
         <div class="tab-content" id="project5">
@@ -130,9 +125,8 @@
     </div>
   </main>
 
-  <footer>
-    <p>&copy; Paris Zhou — 2025</p>
-  </footer>
+  <div data-include="partials/footer.html"></div>
+  <script src="assets/js/include.js"></script>
 
   <script>
     function openTab(evt, tabId) {

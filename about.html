@@ -8,15 +8,8 @@
   <link rel="stylesheet" href="assets/css/about.css" />
 </head>
 <body class="about-page">
-  <header role="banner">
-    <h1>About Me</h1>
-    <nav role="navigation">
-      <a href="index.html">Home</a>
-      <a href="projects.html">Projects</a>
-      <a href="about.html">About</a>
-    </nav>
-  </header>
-
+  <div data-include="partials/header.html"></div>
+  <h1>About Me</h1>
   <main role="main">
     <div class="profile-photo">
       <img src="assets/images/pariszhou.png" alt="Paris Zhou" class="profile-pic">
@@ -44,8 +37,7 @@
     </section>
   </main>
 
-  <footer role="contentinfo">
-    <p>&copy; Paris Zhou — 2025</p>
-  </footer>
+  <div data-include="partials/footer.html"></div>
+  <script src="assets/js/include.js"></script>
 </body>
 </html>

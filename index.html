@@ -8,14 +8,8 @@
   <link rel="stylesheet" href="assets/css/home.css" />
 </head>
 <body class="home-page">
-  <header>
-    <h1>Paris Zhou</h1>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="projects.html">Projects</a>
-      <a href="about.html">About</a>
-    </nav>
-  </header>
+  <div data-include="partials/header.html"></div>
+  <h1>Paris Zhou</h1>
 
   <main>
     <aside class="sidebar">
@@ -84,8 +78,29 @@
       <section class="card job-history">
         <h2>Job History</h2>
         <ul>
-          <li><strong>Medical Scribe</strong> – OHSU (2022–2024)</li>
-          <li><strong>Certified Nursing Assistant</strong> – Marquis (2018–2019)</li>
+          <li>
+            <strong>Software Developer</strong> – ISOLINT LLC (2025 – Present)
+            <ul class="job-description">
+              <li>Creating AI WebPage Chatbots for local businesses.</li>
+              <li>Creating AI Phone Receptionist applications for local businesses.</li>
+              <li>Collaborating with multiple educators across America to integrate Rust-based backend services for grading workflows.</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Medical Scribe</strong> – OHSU (2022 – 2024)
+            <ul class="job-description">
+              <li>Documented 100+ patient encounters per week in a digital-record system, maintaining 99% accuracy and attention to detail under time constraints.</li>
+              <li>Collaborated with physicians in real time to produce thorough medical reports, demonstrating strong communication skills and quick adaptability to new software tools.</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Certified Nursing Assistant</strong> – Marquis (2018 – 2019)
+            <ul class="job-description">
+              <li>Assisted in daily patient care tasks, including vital sign monitoring and mobility support.</li>
+              <li>Maintained meticulous patient records and communicated changes promptly to RNs.</li>
+              <li>Received commendation for compassionate patient interactions and reliability.</li>
+            </ul>
+          </li>
         </ul>
       </section>
 
@@ -121,8 +136,7 @@
     </div>
   </main>
 
-  <footer>
-    <p>&copy; Paris Zhou — 2025</p>
-  </footer>
+  <div data-include="partials/footer.html"></div>
+  <script src="assets/js/include.js"></script>
 </body>
 </html>

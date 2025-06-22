@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Project Start — Customer Relations Churn Rate</title>
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <link rel="stylesheet" href="../../assets/css/blog.css" />
+</head>
+<style>
+  .scrollbox {
+    overflow-x: auto;
+    white-space: nowrap;
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #888888 #f1f1f1;
+  }
+
+  /* WebKit browsers */
+  .scrollbox::-webkit-scrollbar {
+    height: 6px;
+  }
+  .scrollbox::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  .scrollbox::-webkit-scrollbar-thumb {
+    background-color: #888888;
+    border-radius: 3px;
+    border: 1px solid transparent;
+    background-clip: content-box;
+  }
+  .scrollbox::-webkit-scrollbar-thumb:hover {
+    background-color: #555555;
+  }
+</style>
+
+
+<body>
+  <div data-include="../../partials/blog_header.html"></div>
+  <main>
+    <article class="blog-post">
+      <h1>Project Start — Donor Relations Churn Rate</h1>
+      <div class="scroll-container">
+        <p><strong>Machine learning (ML) projects</strong> come in many shapes and sizes. With limited experience in software engineering, I sought to find a project to rigorously challenge myself and learn more about real-world applications of machine learning. I've decided on creating a donor-churn rate analysis platform based on a Customer Relations Management dataset found on Kaggle. Today I accomplished a couple of things:</p>
+
+        <ul>
+          <li>Defined a minimal CI/CD workflow</li>
+          <li>Sourced data from Kaggle</li>
+          <li>Ingested and validated said data with pandas</li>
+          <li>Planned feature engineering for donor churn analysis</li>
+        </ul>
+
+        <h2>Why such an ambitious project?</h2>
+        <p>My goals for picking such a complex project revolve around my desire to learn about how real-world applications are deployed and to gain experience with the unspoken hurdles of software development. Four things I hope to learn more about with this project are:</p>
+        <ul>
+          <li><strong>Containers & consistency:</strong> packaging models in Docker</li>
+          <li><strong>APIs & routing:</strong> serving predictions via FastAPI/Flask or tools like BentoML</li>
+          <li><strong>Reliability:</strong> load testing, monitoring, and circuit breakers</li>
+          <li><strong>Versioning:</strong> tracking data, code, and models with MLflow or DVC</li>
+        </ul>
+
+        <p>Another example of a complex machine learning project is a content‑recommendation engine. It could entail producing a model that releases nightly batch updates plus a low‑latency real‑time API. Accessory dashboards (Grafana) and rollback strategies are additional side projects included within such a project.</p>
+
+        <h2>Minimal CI/CD: Avoiding Over‑Engineering</h2>
+        <p>I initially aimed for a full GitHub Actions matrix covering Docker build, push, and multi‑platform testing. Quickly, I realized it was slowing me down. Instead, I settled on an ultra‑minimal pipeline of testing each build on <strong>main</strong>. This keeps feedback fast and lets me focus on developing the model instead of chasing CI/CD bugs. Once I have data pipelining fully complete and feature engineering plans in place, I plan to reimplement the CI/CD workflows I previously dropped. Currently, they serve little benefit besides stopping me from running the test I really need to see results in.</p>
+
+        <h2>Finding & Understanding the Data</h2>
+        <p>I chose the <a href="https://www.kaggle.com/datasets/gaurobsaha/customer-relationship-management-dataset/data">Kaggle CRM donor dataset by gaurobsaha</a> as my starting point. It’s clean and complete, perfect for prototyping. But real‑life data often looks nothing like this:</p>
+        <ul>
+          <li>Missing values in key fields (e.g., no email or last‑donation date)</li>
+          <li>Inconsistent formatting, like phone numbers with extensions</li>
+          <li>Partial histories: donors who gave ages ago but never again</li>
+        </ul>
+        <p>Handling these imperfections requires extra steps: imputation, record filtering, and validation. Hopefully, when I become more experienced with data-engineering tools, I'll build another project to handle data gathered in real-time.</p>
+        <p>Of note, these data are simulated. This picture is not of real personal information.</p>
+        <div class="scrollbox" style="overflow-x: auto; white-space: nowrap;">
+        <img
+            src="../../assets/images/MLproject/CRMcsv.png"
+            alt="Screenshot of CRM CSV data"
+            style="display: inline-block; max-height: 400px;"
+        />
+        </div>
+        <h2>Ingesting & Validating with pandas</h2>
+        <p>To turn the raw CSV into reliable sources of data, I:</p>
+        <ul>
+          <li>Loaded it via <strong>pd.read_csv()</strong></li>
+          <li>Validated against a JSON schema (auto‑generated from the initial table) to ensure all columns exist and types match</li>
+          <li>Snapped it to Parquet for downstream use</li>
+          <img src="../../assets/images/MLproject/pandasDF.png" alt="Screenshot of the very simple function for converting csv to pandas dataframe">
+        </ul>
+        <p>This pipeline guarantees that every downstream process sees the same clean snapshot.</p>
+        <img
+            src="../../assets/images/MLproject/data_pipelining.png"
+            alt="Screenshot of CRM CSV data conversion function that changes the dataframe python objects into numpy compatible objects"
+            style="display: inline-block;"
+        />
+        
+        <p>
+        The pandas <strong>DataFrame</strong> is a two-dimensional, size-mutable, and table like data structure in Python.
+        It allows you to load data from CSV, Excel, SQL databases, and more into a structured format with labeled axes.
+        With built-in methods for indexing, slicing, grouping, and pivoting, you can easily clean, transform, and aggregate large datasets.
+        Pandas also offers functions for handling of missing values, time-series functionality, and vectorized operations for fast, efficient data analysis.
+        The backend leverages low level librarys to skip out on python's Global Interpreter Lock and reach C-like speeds.
+        </p>
+        
+        <div
+        style="
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        "
+        >
+        <figure style="margin: 0; text-align: center; width: 100%;">
+            <img
+            src="../../assets/images/MLproject/unconverted.png"
+            alt="Before conversion"
+            style="width: 100%; height: auto;"
+            />
+            <figcaption style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+            Before conversion, fields such as FirstName and DonorID are "object" which is panda's way of letting us know that those columns are currently python objects. 
+            These data are packed by python in a way to accomodate for its dynamically typed and interpreted language.
+            </figcaption>
+        </figure>
+
+        <figure style="margin: 0; text-align: center; width: 100%;">
+            <img
+            src="../../assets/images/MLproject/converted.png"
+            alt="After conversion"
+            style="width: 100%; height: auto;"
+            />
+            <figcaption style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+            After conversion, columns are converted into appropriate types compatible with the low level backend libraries. This will save some computational efficiency.
+        
+            </figcaption>
+        </figure>
+        <section>
+            <h2>Memory Savings: Python Objects vs. pandas Arrays</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Python Objects</th>
+                    <th>pandas Array Storage</th>
+                    <th>Per-Element Saving</th>
+                    <th>Total Saving (5 000 rows)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>String (e.g. <code>DonorID</code>)</td>
+                    <td>~50 bytes overhead + per-char storage</td>
+                    <td>8 bytes pointer + per-char</td>
+                    <td>~42 bytes</td>
+                    <td>6 cols × 5 000 × 42 B ≈ 1.26 MB</td>
+                </tr>
+                <tr>
+                    <td>Bool</td>
+                    <td>~28 bytes per <code>bool</code></td>
+                    <td>1 byte per element</td>
+                    <td>~27 bytes</td>
+                    <td>1 col × 5 000 × 27 B ≈ 0.13 MB</td>
+                </tr>
+                <tr>
+                    <td><strong>Total</strong></td>
+                    <td colspan="3"></td>
+                    <td><strong>≈ 1.4 MB saved</strong></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <p>
+                By switching Python <code>str</code> and <code>bool</code> objects into pandas’ homogeneous
+                arrays, you free on the order of <strong>1–2 MB of RAM</strong> for just 5 000 rows—and
+                those savings grow linearly with more data.
+            </p>
+
+            <p>
+                At this small scale, 1–2 MB is negligible compared to the hundreds of megabytes (or more)
+                consumed by model tensors and frameworks. However, the way data is packed has far-reaching
+                implications:
+            </p>
+            <ul>
+                <li>
+                <strong>Linear scaling:</strong> 1 000× more rows → ~1–2 GB saved, which is material
+                when handling millions of records.
+                </li>
+                <li>
+                <strong>Performance gains:</strong> Contiguous, fixed-typed buffers enable vectorized
+                operations and better cache utilization—vastly outperforming Python-object loops.
+                </li>
+                <li>
+                <strong>Reduced interpreter overhead:</strong> Fewer Python objects lightens the garbage
+                collector’s workload.
+                </li>
+            </ul>
+            <p>
+                For tech giants like Google or Meta, serving billions of users, efficient data packing would lead to terabytes of savings.
+            </p>
+            </section>
+        </div>
+        <h2>Planning Feature Engineering</h2>
+        <p>With clean data in hand, the next step is deriving signals that predict donor churn:</p>
+        <ul>
+          <li>Recency/Frequency/Monetary (RFM) scores</li>
+          <li>Engagement ratios, e.g. <strong>engagement_score * total_gifts</strong></li>
+        </ul>
+        <p>I’ll explore these more in my next post when I get to feature engineering— including how to evaluate model performance (precision/recall vs. business KPIs) and optimize for both accuracy and latency when serving predictions.</p>
+
+        <h2>Next Steps & Takeaways</h2>
+        <ul>
+          <li>Research feature engineering practices</li>
+          <li>Decide the best features for my model to train to optimize for</li>
+          <li>Build the first model baseline with logistic regression or a shallow gradient boosting machine</li>
+        </ul>
+
+        <p><em>Stay tuned for Part 2, where I dive into feature implementation and end‑to‑end model evaluation!</em></p>
+
+        <p><strong>Published on June 22, 2025 — Paris Zhou</strong></p>
+      </div>
+
+      <footer class="blog-post__footer">
+        <a href="../../blog.html" class="blog-post__back-link">← Back to Blog</a>
+      </footer>
+    </article>
+  </main>
+  <div data-include="../../partials/footer.html"></div>
+  <script src="../../assets/js/include.js"></script>
+</body>
+</html>
