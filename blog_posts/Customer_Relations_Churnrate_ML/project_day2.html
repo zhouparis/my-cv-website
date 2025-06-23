@@ -9,691 +9,722 @@
 </head>
 <body>
   <div data-include="../../partials/blog_header.html"></div>
-  <main>
-    <article class="blog-post">
-        <h1>Day 2 - Feature Engineering (Sorta) </h1>
-        <div class="scroll-container">
-
-        <section class="post-content">
-            <p>
-                Now that I’ve loaded the data into a pandas dataframe the next step is to analyze the data and determine how we can relate these metrics to our ultimate goal of predicting churn. For our next section the writing style will not be as professional. Though not quite stream of consciousness, today's blog will be more of a documentation of my process. I typed it as I went so if it is narratively jarring I apologize in advance.
-            </p>
-
-            <p>
-                I am basing the majority of my understanding about feature engineering concepts on the
-                <a href="https://www.youtube.com/watch?v=h0e2HAPTGF4" target="_blank" rel="noopener noreferrer">MIT OpenCourseWare series on YouTube</a>.
-                I am also basing some understanding on
-                <a href="https://www.oreilly.com/library/view/ai-engineering/9781098166298/" target="_blank" rel="noopener noreferrer">AI Engineering by Chip Huyen</a>,
-                an excellent read for anyone trying to build a machine learning project or foundational model application project.
-            </p>
-            <p>
-                My understanding about feature engineering put into one sentence is to find ways we can group our data meaningfully while minimizing bias.  
-            </p>
-            <p>
-                In some scenarios data may be separated clearly, in others it may be less clear. Feature engineering is selecting by what dimensions we want our data to be grouped by such that our model will learn on data that will lead it to the correct predictions.
-            </p>
-
-            <h2>Donor Data Schema</h2>
-
-            <table class="blog-post blog-table">
-            <thead>
-                <tr>
-                <th>Column Name</th>
-                <th>Data Type</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>DonorID</td><td>string</td></tr>
-                <tr><td>FirstName</td><td>string</td></tr>
-                <tr><td>LastName</td><td>string</td></tr>
-                <tr><td>Email</td><td>string</td></tr>
-                <tr><td>Phone</td><td>string</td></tr>
-                <tr><td>City</td><td>string</td></tr>
-                <tr><td>State</td><td>string</td></tr>
-                <tr><td>ZipCode</td><td>int32</td></tr>
-                <tr><td>LastDonationDate</td><td>datetime64[ns]</td></tr>
-                <tr><td>TotalGifts</td><td>int32</td></tr>
-                <tr><td>TotalAmountDonated</td><td>int32</td></tr>
-                <tr><td>EventParticipation</td><td>bool</td></tr>
-                <tr><td>EngagementScore</td><td>int32</td></tr>
-            </tbody>
-            </table>
-            <img
-                    src="../../assets/images/data_analysis_pictures/schema.png" 
-                    alt="A dataset overview showing the key value pairs of the Customer Relations Management dataset found from kaggle" 
-                    style="width: 100%; height: auto;"
-                />
-                <figcaption style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
-                A dataset overview showing the key value pairs of the Customer Relations Management dataset found from kaggle
-            </figcaption>
-        </section>
-
-        <p>
-        Intuitively in the first step I want to start by defining what we want to consider churn considering there are no explicit definitions of churn within the dataset columns.
-        </p>
-
-        <p>
-        Since we are at a nice donor sample size of 5000 people we have no need for bootstrapping as the Central Limit Theorum (CLT) and our sample size of n>>30 mean that we are most likely seeing the true population means and distrbutions.
-        </p>
-
-        <p>
-        Thank you to my wonderful TA’s in ST351/ST352 for drilling this into my brain so that I can regurgitate it 7 years later on this blog.
-        </p>
-
-        <p>
-        Since this CRM data is fabricated, there are not many sampling biases to consider right now.
-        </p>
-
-        <p>
-        In real life data analysis, sampling biases are more critical to address as they can contaminate data and if not addressed will certainly impact the validity of conclusions.
-        </p>
-
-        <p>
-        In 2 simple and clear sentences relating to sampling about birds.
-        </p>
-
-        <p>
-        If I search for "black birds," the data are messy enough that it can be challenging determine if my sampled data applies ravens or crows. If I make conclusions about data about ravens and find a true mean, I cannot use that true mean to make conclusions about crows.
-        </p>
+    <main>
         <article class="blog-post">
-        <h2>Establishing Donor Churn Criteria</h2>
+            <h1>Day 2 - Feature Engineering (Sorta) </h1>
+            <div class="scroll-container">
 
-        <p>
-            To determine our criteria for donor churn I am going to start by plotting the datapoints of last donation date.
-            This allows me to analyze what would be a likely duration since last donation vs unlikely.
-            If the data reveals a significant right skew, the plotting will help identify a set of days by which we can label a donor as “churned.”
-        </p>
+                <section class="post-content">
+                    <p>
+                        Now that I’ve loaded the data into a pandas dataframe the next step is to analyze the data and determine how we can relate these metrics to our ultimate goal of predicting churn. For our next section the writing style will not be as professional. Though not quite stream of consciousness, today's blog will be more of a documentation of my process. I typed it as I went so if it is narratively jarring I apologize in advance.
+                    </p>
 
-        <div class="image-gallery">
-        <figure>
-            <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_boxplot.png" alt="Days Since Donation Boxplot" />
-            <figcaption>Days Since Donation — Boxplot</figcaption>
-        </figure>
-        <figure>
-            <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_hist.png" alt="Days Since Donation Histogram" />
-            <figcaption>Days Since Donation — Histogram</figcaption>
-        </figure>
-        <figure>
-            <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_kde.png" alt="Days Since Donation KDE" />
-            <figcaption>Days Since Donation — KDE</figcaption>
-        </figure>
-        <figure>
-            <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_rug.png" alt="Days Since Donation Rug Plot" />
-            <figcaption>Days Since Donation — Rug Plot</figcaption>
-        </figure>
-        <figure>
-            <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_violin.png" alt="Days Since Donation Violin Plot" />
-            <figcaption>Days Since Donation — Violin Plot</figcaption>
-        </figure>
-        </div>
+                    <p>
+                        I am basing the majority of my understanding about feature engineering concepts on the
+                        <a href="https://www.youtube.com/watch?v=h0e2HAPTGF4" target="_blank" rel="noopener noreferrer">MIT OpenCourseWare series on YouTube</a>.
+                        I am also basing some understanding on
+                        <a href="https://www.oreilly.com/library/view/ai-engineering/9781098166298/" target="_blank" rel="noopener noreferrer">AI Engineering by Chip Huyen</a>,
+                        an excellent read for anyone trying to build a machine learning project or foundational model application project.
+                    </p>
+                    <p>
+                        My understanding about feature engineering put into one sentence is to find ways we can group our data meaningfully while minimizing bias.  
+                    </p>
+                    <p>
+                        In some scenarios data may be separated clearly, in others it may be less clear. Feature engineering is selecting by what dimensions we want our data to be grouped by such that our model will learn on data that will lead it to the correct predictions.
+                    </p>
 
-        <p>
-            The displayed data above reveals a uniform distribution in all examples. The lack of a clear skew to me indicates that donors are not affected strongly by recency
-            and using days since last donation by itself is not a good metric to compare by itself.
-        </p>
-        <p class="shadow-block">
-        <strong>
-            Let it be noted that while it was the correct conclusion for me to assume that it is an ineffective feature in isolation, my intuitions about donors lacking a recency bias was incorrect. I will mention more later.
-        </strong>
-        </p>
+                    <h2>Donor Data Schema</h2>
 
-        <p>
-            At this point, I am having a subtle realization just how many ways the data can be compared and interpreted. Wow.
-        </p>
-        <p>
-            Though it is vast it is not limitless.
-            Moreover, with our dataset there are several columns that are related to location or contact information
-            that I do not suspect to be related to churn and can be excluded from comparison.
-            I will focus on the following candidate fields:  <strong>EventParticipation</strong>, <strong>EngagementScore</strong>, <strong>EventParticipation</strong>,
-            <strong>TotalAmountDonated</strong>, and <strong>TotalGifts</strong>.
-        </p>
-
-        <h3>Candidate fields</h3>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
-            <thead>
-            <tr style="background-color: #f0f0f0;">
-                <th style="padding: 0.5rem; border: 1px solid #ccc;">Variable</th>
-                <th style="padding: 0.5rem; border: 1px solid #ccc;">Type</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td style="padding: 0.5rem; border: 1px solid #ccc;">EngagementScore</td>
-                <td style="padding: 0.5rem; border: 1px solid #ccc;">Continuous</td>
-            </tr>
-            <tr>
-                <td style="padding: 0.5rem; border: 1px solid #ccc;">EventParticipation</td>
-                <td style="padding: 0.5rem; border: 1px solid #ccc;">Boolean</td>
-            </tr>
-            <tr>
-                <td style="padding: 0.5rem; border: 1px solid #ccc;">TotalAmountDonated</td>
-                <td style="padding: 0.5rem; border: 1px solid #ccc;">Continuous</td>
-            </tr>
-            <tr>
-                <td style="padding: 0.5rem; border: 1px solid #ccc;">TotalGifts</td>
-                <td style="padding: 0.5rem; border: 1px solid #ccc;">Continuous</td>
-            </tr>
-            <tr>
-                <td style="padding: 0.5rem; border: 1px solid #ccc;">LastDonationDate</td>
-                <td style="padding: 0.5rem; border: 1px solid #ccc;">Continuous</td>
-            </tr>
-            </tbody>
-        </table>
-        <h2>Data Analysis</h2>
-        <p class="shadow-block">
-        <strong>
-        I initially started with bivariate analysis but ended up with lots of very difficult to read data. So I went back to univariate analysis to try and understand the data better. I also took a very long time to create my representations because I was initially using matplotlib, using the internet I found that seaborn was great for visualizing data so I decided to switch to seaborn.
-        </strong>
-        </p>
-        <p>
-        I am approaching data analysis with a first principles mindset. I feel like a very useful heuristic in every discipline is to focus on foundations when it comes to projects.
-        With machine learning being so extremely data-quality dependant I am being extra thorough and am willing to research methods beyond my experienced domain.
-        </p>
-        <h2>Univariate Analysis</h2>
-        <table border="1" cellspacing="0" cellpadding="6">
-            <thead>
-                <tr>
-                    <th>Plot Type</th>
-                    <th>Reason for Use</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Histogram</td>
-                    <td>Visualizes frequency distribution by binning values. Useful for understanding skew, modality, and overall shape of a variable.</td>
-                </tr>
-                <tr>
-                    <td>KDE</td>
-                    <td>Provides a smooth estimate of a variable's distribution. Reveals underlying structure without the discontinuities of histograms.</td>
-                </tr>
-                <tr>
-                    <td>Rug</td>
-                    <td>Displays individual data points along an axis. Useful as a supplementary plot to show density or sparsity of values.</td>
-                </tr>
-                <tr>
-                    <td>Boxplot</td>
-                    <td>Summarizes distribution via median, quartiles, and outliers. Excellent for comparing distributions across groups.</td>
-                </tr>
-                <tr>
-                    <td>Violin</td>
-                    <td>Combines KDE and boxplot features. Reveals both central tendency and full distribution shape in one compact visual.</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <section class="image-gallery">
-        <h3>Continuous vs Boolean</h3>
-        <figure>
-            <img src="../../assets/images/data_analysis_pictures/images/Continuous vs Boolean/donated_vs_participation_original.png" alt="donated vs participation">
-            <figcaption> Histogram representations of <strong>whether a donor participated in an event</strong> vs <strong>total donation amount</strong></figcaption>
-        </figure>
-        <figure>
-            <img src="../../assets/images/data_analysis_pictures/images/Continuous vs Boolean/engagement_vs_participation_original.png" alt="engagement vs participation">
-            <figcaption>Histogram representations of <strong>whether a donor participated in an event</strong> vs <strong>their engagment score</strong></figcaption>
-        </figure>
-        <figure>
-            <img src="../../assets/images/data_analysis_pictures/images/Continuous vs Boolean/gifts_vs_participation_original.png" alt="gifts vs participation">
-            <figcaption>Histogram representations of <strong>whether a donor participated in an event</strong> vs <strong>their total number of gifts donated</strong></figcaption>
-        </figure>
-        <figure>
-            <img src="../../assets/images/data_analysis_pictures/images/Continuous vs Boolean/lastdate_vs_participation_original.png" alt="lastdate vs participation">
-            <figcaption>Histogram representations of <strong>whether a donor participated in an event</strong> vs <strong>their last day of donating</strong></figcaption>
-        </figure>
-        </section>
-        <p class="shadow-block">
-        <strong>
-        Though the data were difficult to read there were some very obvious trends. Those who had never participated had also never donated. </p>
-        </strong>
-        </p>
-        <section class="image-gallery">
-        <h3>Continuous-Continuous</h3>
-        <figure>
-            <img src="../../assets/images/data_analysis_pictures/images/Continuous-Continuous/donated_vs_gifts_scatter.png" alt="donated vs gifts scatter">
-            <figcaption>Scatterplot representations of donors and <strong>total donation amount</strong> vs <strong>their total number of gifts donated</strong></figcaption>
-        </figure>
-        <figure>
-            <img src="../../assets/images/data_analysis_pictures/images/Continuous-Continuous/donated_vs_lastdate_scatter.png" alt="donated vs lastdate scatter">
-            <figcaption>Scatterplot representations of donors and <strong>total donation amount</strong> vs <strong>their last day of donating</strong></figcaption>
-        </figure>
-        <figure>
-            <img src="../../assets/images/data_analysis_pictures/images/Continuous-Continuous/engagement_vs_donated_scatter.png" alt="engagement vs donated scatter">
-            <figcaption>Scatterplot representations of donors and <strong>their engagment score</strong> vs <strong>total donation amount</strong> </figcaption>
-        </figure>
-        <figure>
-            <img src="../../assets/images/data_analysis_pictures/images/Continuous-Continuous/engagement_vs_gifts_scatter.png" alt="engagement vs gifts scatter">
-            <figcaption>Scatterplot representations of donors and <strong>their engagment score</strong> vs <strong>their total number of gifts donated</strong></figcaption>
-        </figure>
-        <figure>
-            <img src="../../assets/images/data_analysis_pictures/images/Continuous-Continuous/engagement_vs_lastdate_scatter.png" alt="engagement vs lastdate scatter">
-            <figcaption>Scatterplot representations of donors and <strong>their engagment score</strong> vs <strong>their last day of donating</strong></figcaption>
-        </figure>
-        <figure>
-            <img src="../../assets/images/data_analysis_pictures/images/Continuous-Continuous/gifts_vs_lastdate_scatter.png" alt="gifts vs lastdate scatter">
-            <figcaption>Scatterplot representations of donors and <strong>their total number of gifts donated</strong> vs <strong>their last day of donating</strong></figcaption>
-        </figure>
-        </section>
-        <p>
-            Unfortunately the continuous-continuous variable comparisons did not reveal anything interesting so I had to modify my approach.
-        </p>
-        <p>I decided to do a deeper analysis of the variables and thought it would be useful to divide total amount donated by total gifts given. This revealed a right skew. The majority of people make smaller donations.
-        I suspect donation and engagement scores may be more useful for analysis in combination with other data since they were relatively uniform distributions.
-        </p>
-
-        <section class="image-gallery">
-            <h3>Days Since Donation</h3>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_boxplot.png" alt="DaysSinceDonation boxplot">
-                <figcaption>Boxplot representations of donors and <strong>days since their last donation</strong></figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_hist.png" alt="DaysSinceDonation histogram">
-                <figcaption>Histogram representations of donors and <strong>days since their last donation</strong></figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_kde.png" alt="DaysSinceDonation KDE">
-                <figcaption>KDE representations of donors and <strong>days since their last donation</strong></figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_rug.png" alt="DaysSinceDonation rugplot">
-                <figcaption>Rug representations of donors and <strong>days since their last donation</strong></figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_violin.png" alt="DaysSinceDonation violin">
-                <figcaption>Violin representations of donors and <strong>days since their last donation</strong></figcaption>
-            </figure>
-
-            <h3>Total Amount Donated ÷ Total Gifts</h3>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DonatedDivTotalGifts/DonatedDivTotalGifts_boxplot.png" alt="DonatedDivTotalGifts boxplot">
-                <figcaption>Boxplot representations of donors and <strong>average amount donated per gift</strong></figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DonatedDivTotalGifts/DonatedDivTotalGifts_hist.png" alt="DonatedDivTotalGifts histogram">
-                <figcaption>Histogram representations of donors and <strong>average amount donated per gift</strong></figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DonatedDivTotalGifts/DonatedDivTotalGifts_kde.png" alt="DonatedDivTotalGifts KDE">
-                <figcaption>KDE representations of donors and <strong>average amount donated per gift</strong></figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DonatedDivTotalGifts/DonatedDivTotalGifts_rug.png" alt="DonatedDivTotalGifts rugplot">
-                <figcaption>Rug representations of donors and <strong>average amount donated per gift</strong></figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DonatedDivTotalGifts/DonatedDivTotalGifts_violin.png" alt="DonatedDivTotalGifts violin">
-                <figcaption>Violin representations of donors and <strong>average amount donated per gift</strong></figcaption>
-            </figure>
-
-            <h3>Engagement Score</h3>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/EngagementScore/EngagementScore_boxplot.png" alt="EngagementScore boxplot">
-                <figcaption>Boxplot representations of donors and their <strong>Engagement Score</strong></figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/EngagementScore/EngagementScore_hist.png" alt="EngagementScore histogram">
-                <figcaption>Histogram representations of donors and their <strong>Engagement Score</strong></figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/EngagementScore/EngagementScore_kde.png" alt="EngagementScore KDE">
-                <figcaption>KDE representations of donors and their <strong>Engagement Score</strong></figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/EngagementScore/EngagementScore_rug.png" alt="EngagementScore rugplot">
-                <figcaption>Rug representations of donors and their <strong>Engagement Score</strong></figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/EngagementScore/EngagementScore_violin.png" alt="EngagementScore violin">
-                <figcaption>Violin representations of donors and their <strong>Engagement Score</strong></figcaption>
-            </figure>
-
-            <h3>Log Transform of Average Donation Amount</h3>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/logDonatedDivTotalGifts/LogDonatedDivTotalGifts_boxplot.png" alt="LogDonatedDivTotalGifts boxplot">
-                <figcaption>Boxplot representations of donors and their <strong>Log Transformed Average Donation Amount</strong></figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/logDonatedDivTotalGifts/LogDonatedDivTotalGifts_hist.png" alt="LogDonatedDivTotalGifts histogram">
-                <figcaption>Histogram representations of donors and their <strong>Log Transformed Average Donation Amount</strong></figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/logDonatedDivTotalGifts/LogDonatedDivTotalGifts_kde.png" alt="LogDonatedDivTotalGifts KDE">
-                <figcaption>KDE representations of donors and their <strong>Log Transformed Average Donation Amount</strong></figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/logDonatedDivTotalGifts/LogDonatedDivTotalGifts_rug.png" alt="LogDonatedDivTotalGifts rugplot">
-                <figcaption>Rug representations of donors and their <strong>Log Transformed Average Donation Amount</strong></figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/logDonatedDivTotalGifts/LogDonatedDivTotalGifts_violin.png" alt="LogDonatedDivTotalGifts violin">
-                <figcaption>Violin representations of donors and their <strong>Log Transformed Average Donation Amount</strong></figcaption>
-            </figure>
-        </section>
-
-        <table border="1" cellspacing="0" cellpadding="6">
-                <thead>
-                    <tr>
-                    <th>Plot Type</th>
-                    <th>Reason for Use</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                    <td>Scatter</td>
-                    <td>Useful when variables are uniformly distributed. Highlights overall spread and independence; no clear directional trend suggests weak correlation.</td>
-                    </tr>
-                    <tr>
-                    <td>Hexbin</td>
-                    <td>Ideal for high-density or discrete data with many overlapping points. Reveals clustered structure in large datasets or blocky distributions.</td>
-                    </tr>
-                    <tr>
-                    <td>Joint</td>
-                    <td>Combines scatterplot with marginal histograms. Helps identify relationships while showing distributional structure of each variable.</td>
-                    </tr>
-                    <tr>
-                    <td>LOWESS</td>
-                    <td>Detects subtle or nonlinear trends in scatterplots. Useful when scatter looks flat but curvature or slope might exist.</td>
-                    </tr>
-                    <tr>
-                    <td>Linear</td>
-                    <td>Tests for global linear relationships between variables. Useful when the spread is uniform but correlation might exist.</td>
-                    </tr>
-                    <tr>
-                    <td>Residuals</td>
-                    <td>Displays deviations from linear predictions. Useful for diagnosing model fit, heteroscedasticity, or hidden patterns.</td>
-                    </tr>
-                    <tr>
-                    <td>KDE 2D</td>
-                    <td>Estimates the smooth density of two continuous variables. Ideal for visualizing structure in noisy or overlapping data.</td>
-                    </tr>
-                </tbody>
-            </table>
-            <section class="image-gallery">
-            <h3>Days Since Last Donation vs Log Transformed Average Donation Amounts</h3>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/DaysSinceDonation_vs_LogDonatedDivTotalGifts_hexbin.png" alt="Hexbin plot">
-                <figcaption>hexbin</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/DaysSinceDonation_vs_LogDonatedDivTotalGifts_joint.png" alt="Joint plot">
-                <figcaption>joint</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/DaysSinceDonation_vs_LogDonatedDivTotalGifts_kde2d.png" alt="KDE 2D plot">
-                <figcaption>kde2d</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/DaysSinceDonation_vs_LogDonatedDivTotalGifts_linear.png" alt="Linear regression">
-                <figcaption>linear</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/DaysSinceDonation_vs_LogDonatedDivTotalGifts_lowess.png" alt="LOWESS">
-                <figcaption>lowess</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/DaysSinceDonation_vs_LogDonatedDivTotalGifts_residuals.png" alt="Residuals">
-                <figcaption>residuals</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/DaysSinceDonation_vs_LogDonatedDivTotalGifts_scatter.png" alt="Scatterplot">
-                <figcaption>scatter</figcaption>
-            </figure>
-
-            <h3>Engagement Score vs Days Since Last Donation</h3>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_DaysSinceDonation_hexbin.png" alt="Hexbin plot">
-                <figcaption>hexbin</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_DaysSinceDonation_joint.png" alt="Joint plot">
-                <figcaption>joint</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_DaysSinceDonation_linear.png" alt="Linear regression">
-                <figcaption>linear</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_DaysSinceDonation_lowess.png" alt="LOWESS">
-                <figcaption>lowess</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_DaysSinceDonation_residuals.png" alt="Residuals">
-                <figcaption>residuals</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_DaysSinceDonation_scatter.png" alt="Scatterplot">
-                <figcaption>scatter</figcaption>
-            </figure>
-
-            <h3>Engagement Score vs Log Transformed Average Donation Amounts</h3>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_LogDonatedDivTotalGifts_hexbin.png" alt="Hexbin plot">
-                <figcaption>hexbin</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_LogDonatedDivTotalGifts_joint.png" alt="Joint plot">
-                <figcaption>joint</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_LogDonatedDivTotalGifts_kde2d.png" alt="KDE 2D plot">
-                <figcaption>kde2d</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_LogDonatedDivTotalGifts_linear.png" alt="Linear regression">
-                <figcaption>linear</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_LogDonatedDivTotalGifts_lowess.png" alt="LOWESS">
-                <figcaption>lowess</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_LogDonatedDivTotalGifts_residuals.png" alt="Residuals">
-                <figcaption>residuals</figcaption>
-            </figure>
-            <figure>
-                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_LogDonatedDivTotalGifts_scatter.png" alt="Scatterplot">
-                <figcaption>scatter</figcaption>
-            </figure>
-            </section>
-
-
-            </article>
-            <article class="blog-post">
-                <h2>Bivariate Analysis</h2>
-
-                <p>
-                    My bivariate analysis yielded little information. Every single comparison showed that all three categories of the data are unrelated.
-                </p>
-
-                <p>
-                    Instead of proceeding to multivariate analysis and feature establishment, I decided that it couldn’t be as simple as participation having a 1-1 correlation to donating and that the majority of people donate in small amounts.
-                    I decided to go back to the drawing board in terms of choosing which parameters to compare.
-                </p>
-
-                <p>
-                    I continued to exclude <strong>Donor ID</strong> as it was an arbitrary ID and inclusion of it may cause a model to learn a stochastic pattern that would improperly bias it.
-                    <strong>First name</strong>, <strong>last name</strong>, <strong>email</strong>, and <strong>phone</strong> were excluded for similar reasons.
-                </p>
-
-                <p>
-                    I decided to include <strong>zipcode</strong> and <strong>state</strong> as they could show different things.
-                    It could be possible that residents of one state benefit greatly from the organization.
-                    It could be possible that an outreach program in that state could be more effective and support increasing outreach efforts in other states.
-                    Whatever the resultant trends (if any) I believe it is worth a look.
-                </p>
-
-                <p>
-                    I am making a deliberate decision to seperate zipcode from state right now because zipcodes don’t necessarily always correlate to geography correctly as it is the distance from the nearest postal distribution center.
-                    There could hypothetically exist a series of zipcodes on the border of multiple states that would appear geographically far apart but actually be very close.
-                    Clustering data by zipcode may also yield different results than clustering by state.
-                </p>
-
-                <p>
-                    I also decided to investigate the skew of low donation amounts and find out if there are any trends in which donors donate more.
-                </p>
-                <p class="shadow-block">
-                <strong>
-                    Unfortunately, I had missed major properties of the data and realized it very late.
-                </strong>
-                </p>
-                <p>
-                I realized that there are a couple trends I appeared to have missed when looking at the plots comparing engagement scores, days since donation, total donations divided by total gifts.                    
-                </p>
-
-                <div class="lightbox-gallery">
-                    <img
-                        src="../../assets/images/data_analysis_pictures/images/everythingLogtransformedPairplot.png"
-                        alt="Log Transformed Pairplot"
-                        onclick="openLightbox(this)"
-                    />
-
-                </div>
-                <!-- Lightbox Modal -->
-                <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-                <span class="lightbox-close" onclick="closeLightbox(event)">&times;</span>
-                <img class="lightbox-content" id="lightbox-img" />
-                <div id="lightbox-caption" class="lightbox-caption"></div>
-                </div>
-                <p>
-                I overlooked the fact that there are trends between log days since donations and log engagement score. There are also trends between log engagement score and log donated div total gifts. 
-                </p>
-            </article>
-            <section>
-                <h2>K - Means Clustering</h2>
-                <section class="blog-post">
-                <h2>Overview of K-Means Clustering</h2>
-
-                <p><strong>K-means clustering</strong> is an a method used to partition data into <strong>K distinct groups</strong> (clusters) based on similarity.</p>
-
-                <h3>How It Works</h3>
-                <ol>
-                    <li>Initialize <strong>K</strong> centroids randomly.</li>
-                    <li>Assign each data point to the <strong>nearest centroid</strong>.</li>
-                    <li>Recalculate centroids as the <strong>mean</strong> of all assigned points.</li>
-                    <li>Repeat until assignments stabilize or a maximum number of iterations is reached.</li>
-                    <a href="https://www.geeksforgeeks.org/machine-learning/k-means-clustering-introduction/?utm_source=chatgpt.com" target="_blank">source</a>
-                </ol>
-                
-                <h3>Use in Data Analysis</h3>
-                <ul>
-                    <li><strong>Exploratory Data Analysis:</strong> Identifies natural groupings (e.g., donor segments).</li>
-                    <li><strong>Dimensionality Reduction Aid:</strong> Preprocessing step before visualization techniques like PCA or t-SNE.</li>
-                </ul>
-                
-                <h3>Use in Machine Learning</h3>
-                <ul>
-                    <li><strong>Customer Segmentation:</strong> Groups users by engagement or purchase history.</li>
-                    <li><strong>Anomaly Detection:</strong> Flags outliers based on distance from centroids.</li>
-                    <a href="https://www.simplilearn.com/tutorials/machine-learning-tutorial/k-means-clustering-algorithm?utm_source=chatgpt.com" target="_blank">source</a>
-                </ul>
-
-                <p>K-means is fast and interpretable but assumes spherical, similarly sized clusters and is sensitive to initial centroid placement.</p>
-                
-                <p> When looking back on this K-means clustering I performed very early, in my inexperience I overlooked the bottom clusters.
-                    I initially analyzed this image among many other graphs and after taking a look at the axises I mistakenly determined this as nonsensical grouping. 
-                    What I failed to realize is my lack of normalization was what caused the poor K-means clustering results.
-                </p>
-                <div class="blog-post__content">
-                    <p>The other features were not in units of days:</p>
-                    <table class="blog-table">
-                        <thead>
+                    <table class="blog-post blog-table">
+                    <thead>
                         <tr>
-                            <th>Feature</th>
-                            <th>Example Units</th>
+                        <th>Column Name</th>
+                        <th>Data Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>DonorID</td><td>string</td></tr>
+                        <tr><td>FirstName</td><td>string</td></tr>
+                        <tr><td>LastName</td><td>string</td></tr>
+                        <tr><td>Email</td><td>string</td></tr>
+                        <tr><td>Phone</td><td>string</td></tr>
+                        <tr><td>City</td><td>string</td></tr>
+                        <tr><td>State</td><td>string</td></tr>
+                        <tr><td>ZipCode</td><td>int32</td></tr>
+                        <tr><td>LastDonationDate</td><td>datetime64[ns]</td></tr>
+                        <tr><td>TotalGifts</td><td>int32</td></tr>
+                        <tr><td>TotalAmountDonated</td><td>int32</td></tr>
+                        <tr><td>EventParticipation</td><td>bool</td></tr>
+                        <tr><td>EngagementScore</td><td>int32</td></tr>
+                    </tbody>
+                    </table>
+                    <img
+                            src="../../assets/images/data_analysis_pictures/schema.png" 
+                            alt="A dataset overview showing the key value pairs of the Customer Relations Management dataset found from kaggle" 
+                            style="width: 100%; height: auto;"
+                    />
+                    <figcaption style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+                        A dataset overview showing the key value pairs of the Customer Relations Management dataset found from kaggle
+                    </figcaption>
+                </section>
+                <article class="blog-post">
+                    <p>
+                    Intuitively in the first step I want to start by defining what we want to consider churn considering there are no explicit definitions of churn within the dataset columns.
+                    </p>
+
+                    <p>
+                    Since we are at a nice donor sample size of 5000 people we have no need for bootstrapping as the Central Limit Theorum (CLT) and our sample size of n>>30 mean that we are most likely seeing the true population means and distrbutions.
+                    </p>
+
+                    <p>
+                    Thank you to my wonderful TA’s in ST351/ST352 for drilling this into my brain so that I can regurgitate it 7 years later on this blog.
+                    </p>
+
+                    <p>
+                    Since this CRM data is fabricated, there are not many sampling biases to consider right now.
+                    </p>
+
+                    <p>
+                    In real life data analysis, sampling biases are more critical to address as they can contaminate data and if not addressed will certainly impact the validity of conclusions.
+                    </p>
+
+                    <p>
+                    In 2 simple and clear sentences relating to sampling about birds.
+                    </p>
+
+                    <p>
+                    If I search for "black birds," the data are messy enough that it can be challenging determine if my sampled data applies ravens or crows. If I make conclusions about data about ravens and find a true mean, I cannot use that true mean to make conclusions about crows.
+                    </p>
+                </article>
+                <article class="blog-post">
+                    <h2>Establishing Donor Churn Criteria</h2>
+
+                    <p>
+                        To determine our criteria for donor churn I am going to start by plotting the datapoints of last donation date.
+                        This allows me to analyze what would be a likely duration since last donation vs unlikely.
+                        If the data reveals a significant right skew, the plotting will help identify a set of days by which we can label a donor as “churned.”
+                    </p>
+                    <details class="gallery-container">
+                        <summary>Click to expand image gallery</summary>
+                        <div class="image-gallery">
+                        <figure>
+                            <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_boxplot.png" alt="Days Since Donation Boxplot" />
+                            <figcaption>Days Since Donation — Boxplot</figcaption>
+                        </figure>
+                        <figure>
+                            <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_hist.png" alt="Days Since Donation Histogram" />
+                            <figcaption>Days Since Donation — Histogram</figcaption>
+                        </figure>
+                        <figure>
+                            <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_kde.png" alt="Days Since Donation KDE" />
+                            <figcaption>Days Since Donation — KDE</figcaption>
+                        </figure>
+                        <figure>
+                            <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_rug.png" alt="Days Since Donation Rug Plot" />
+                            <figcaption>Days Since Donation — Rug Plot</figcaption>
+                        </figure>
+                        <figure>
+                            <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_violin.png" alt="Days Since Donation Violin Plot" />
+                            <figcaption>Days Since Donation — Violin Plot</figcaption>
+                        </figure>
+                        </div>
+                    </details>
+                    <p>
+                        The displayed data above reveals a uniform distribution in all examples. The lack of a clear skew to me indicates that donors are not affected strongly by recency
+                        and using days since last donation by itself is not a good metric to compare by itself.
+                    </p>
+                    <p class="shadow-block">
+                    <strong>
+                        Let it be noted that while it was the correct conclusion for me to assume that it is an ineffective feature in isolation, my intuitions about donors lacking a recency bias was incorrect. I will mention more later.
+                    </strong>
+                    </p>
+
+                    <details class="gallery-container">
+                    <summary>Click to expand image gallery of continuous-boolean bivariate variable analyses</summary>
+                        <section class="image-gallery">
+                        <h3>Continuous vs Boolean</h3>
+                        <figure>
+                            <img src="../../assets/images/data_analysis_pictures/images/Continuous vs Boolean/donated_vs_participation_original.png" alt="donated vs participation">
+                            <figcaption> Histogram representations of <strong>whether a donor participated in an event</strong> vs <strong>total donation amount</strong></figcaption>
+                        </figure>
+                        <figure>
+                            <img src="../../assets/images/data_analysis_pictures/images/Continuous vs Boolean/engagement_vs_participation_original.png" alt="engagement vs participation">
+                            <figcaption>Histogram representations of <strong>whether a donor participated in an event</strong> vs <strong>their engagment score</strong></figcaption>
+                        </figure>
+                        <figure>
+                            <img src="../../assets/images/data_analysis_pictures/images/Continuous vs Boolean/gifts_vs_participation_original.png" alt="gifts vs participation">
+                            <figcaption>Histogram representations of <strong>whether a donor participated in an event</strong> vs <strong>their total number of gifts donated</strong></figcaption>
+                        </figure>
+                        <figure>
+                            <img src="../../assets/images/data_analysis_pictures/images/Continuous vs Boolean/lastdate_vs_participation_original.png" alt="lastdate vs participation">
+                            <figcaption>Histogram representations of <strong>whether a donor participated in an event</strong> vs <strong>their last day of donating</strong></figcaption>
+                        </figure>
+                        </section>
+                    </details>
+                    <p class="shadow-block">
+                    <strong>
+                        Though the data were difficult to read there were some very obvious trends. Those who had never participated had also never donated.
+                    </strong>
+                    </p>
+                    <details class="gallery-container">
+                        <summary>Click to expand image gallery of continuous-continuous bivariate variable analyses</summary>
+                        <section class="image-gallery">
+                        <h3>Continuous-Continuous</h3>
+                        <figure>
+                            <img src="../../assets/images/data_analysis_pictures/images/Continuous-Continuous/donated_vs_gifts_scatter.png" alt="donated vs gifts scatter">
+                            <figcaption>Scatterplot representations of donors and <strong>total donation amount</strong> vs <strong>their total number of gifts donated</strong></figcaption>
+                        </figure>
+                        <figure>
+                            <img src="../../assets/images/data_analysis_pictures/images/Continuous-Continuous/donated_vs_lastdate_scatter.png" alt="donated vs lastdate scatter">
+                            <figcaption>Scatterplot representations of donors and <strong>total donation amount</strong> vs <strong>their last day of donating</strong></figcaption>
+                        </figure>
+                        <figure>
+                            <img src="../../assets/images/data_analysis_pictures/images/Continuous-Continuous/engagement_vs_donated_scatter.png" alt="engagement vs donated scatter">
+                            <figcaption>Scatterplot representations of donors and <strong>their engagment score</strong> vs <strong>total donation amount</strong> </figcaption>
+                        </figure>
+                        <figure>
+                            <img src="../../assets/images/data_analysis_pictures/images/Continuous-Continuous/engagement_vs_gifts_scatter.png" alt="engagement vs gifts scatter">
+                            <figcaption>Scatterplot representations of donors and <strong>their engagment score</strong> vs <strong>their total number of gifts donated</strong></figcaption>
+                        </figure>
+                        <figure>
+                            <img src="../../assets/images/data_analysis_pictures/images/Continuous-Continuous/engagement_vs_lastdate_scatter.png" alt="engagement vs lastdate scatter">
+                            <figcaption>Scatterplot representations of donors and <strong>their engagment score</strong> vs <strong>their last day of donating</strong></figcaption>
+                        </figure>
+                        <figure>
+                            <img src="../../assets/images/data_analysis_pictures/images/Continuous-Continuous/gifts_vs_lastdate_scatter.png" alt="gifts vs lastdate scatter">
+                            <figcaption>Scatterplot representations of donors and <strong>their total number of gifts donated</strong> vs <strong>their last day of donating</strong></figcaption>
+                        </figure>
+                        </section>
+                    </details>
+                    <p>
+                        Unfortunately the continuous-continuous variable comparisons did not reveal anything interesting so I had to modify my approach.
+                    </p>
+                    <p>I decided to do a deeper analysis of the variables and thought it would be useful to divide total amount donated by total gifts given. This revealed a right skew. The majority of people make smaller donations.
+                    I suspect donation and engagement scores may be more useful for analysis in combination with other data since they were relatively uniform distributions.
+                    </p>
+                
+                    <h2>Univariate Analysis</h2>
+                    <table border="1" cellspacing="0" cellpadding="6">
+                        <thead>
+                            <tr>
+                                <th>Plot Type</th>
+                                <th>Reason for Use</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Histogram</td>
+                                <td>Visualizes frequency distribution by binning values. Useful for understanding skew, modality, and overall shape of a variable.</td>
+                            </tr>
+                            <tr>
+                                <td>KDE</td>
+                                <td>Provides a smooth estimate of a variable's distribution. Reveals underlying structure without the discontinuities of histograms.</td>
+                            </tr>
+                            <tr>
+                                <td>Rug</td>
+                                <td>Displays individual data points along an axis. Useful as a supplementary plot to show density or sparsity of values.</td>
+                            </tr>
+                            <tr>
+                                <td>Boxplot</td>
+                                <td>Summarizes distribution via median, quartiles, and outliers. Excellent for comparing distributions across groups.</td>
+                            </tr>
+                            <tr>
+                                <td>Violin</td>
+                                <td>Combines KDE and boxplot features. Reveals both central tendency and full distribution shape in one compact visual.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <details class="gallery-container">
+                        <summary>Click to expand image gallery of data visualizations - Days Since Donation</summary>
+                        <section class="image-gallery">
+                            <h3>Days Since Donation</h3>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_boxplot.png" alt="DaysSinceDonation boxplot">
+                                <figcaption>Boxplot representations of donors and <strong>days since their last donation</strong></figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_hist.png" alt="DaysSinceDonation histogram">
+                                <figcaption>Histogram representations of donors and <strong>days since their last donation</strong></figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_kde.png" alt="DaysSinceDonation KDE">
+                                <figcaption>KDE representations of donors and <strong>days since their last donation</strong></figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_rug.png" alt="DaysSinceDonation rugplot">
+                                <figcaption>Rug representations of donors and <strong>days since their last donation</strong></figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DaysSinceDonation/DaysSinceDonation_violin.png" alt="DaysSinceDonation violin">
+                                <figcaption>Violin representations of donors and <strong>days since their last donation</strong></figcaption>
+                            </figure>
+                        </section>
+                    </details>
+                    <details class="gallery-container">
+                        <summary>Click to expand image gallery of data visualizations - Total Amount Donated ÷ Total Gifts</summary>
+                        <section class="image-gallery">
+                            <h3>Total Amount Donated ÷ Total Gifts</h3>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DonatedDivTotalGifts/DonatedDivTotalGifts_boxplot.png" alt="DonatedDivTotalGifts boxplot">
+                                <figcaption>Boxplot representations of donors and <strong>average amount donated per gift</strong></figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DonatedDivTotalGifts/DonatedDivTotalGifts_hist.png" alt="DonatedDivTotalGifts histogram">
+                                <figcaption>Histogram representations of donors and <strong>average amount donated per gift</strong></figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DonatedDivTotalGifts/DonatedDivTotalGifts_kde.png" alt="DonatedDivTotalGifts KDE">
+                                <figcaption>KDE representations of donors and <strong>average amount donated per gift</strong></figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DonatedDivTotalGifts/DonatedDivTotalGifts_rug.png" alt="DonatedDivTotalGifts rugplot">
+                                <figcaption>Rug representations of donors and <strong>average amount donated per gift</strong></figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/DonatedDivTotalGifts/DonatedDivTotalGifts_violin.png" alt="DonatedDivTotalGifts violin">
+                                <figcaption>Violin representations of donors and <strong>average amount donated per gift</strong></figcaption>
+                            </figure>
+                        </section>
+                    </details>
+                    <details class="gallery-container">
+                        <summary>Click to expand image gallery of data visualizations - Engagement Score</summary>
+                        <section class="image-gallery">
+                            <h3>Engagement Score</h3>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/EngagementScore/EngagementScore_boxplot.png" alt="EngagementScore boxplot">
+                                <figcaption>Boxplot representations of donors and their <strong>Engagement Score</strong></figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/EngagementScore/EngagementScore_hist.png" alt="EngagementScore histogram">
+                                <figcaption>Histogram representations of donors and their <strong>Engagement Score</strong></figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/EngagementScore/EngagementScore_kde.png" alt="EngagementScore KDE">
+                                <figcaption>KDE representations of donors and their <strong>Engagement Score</strong></figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/EngagementScore/EngagementScore_rug.png" alt="EngagementScore rugplot">
+                                <figcaption>Rug representations of donors and their <strong>Engagement Score</strong></figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/EngagementScore/EngagementScore_violin.png" alt="EngagementScore violin">
+                                <figcaption>Violin representations of donors and their <strong>Engagement Score</strong></figcaption>
+                            </figure>
+                        </section>
+                    </details>
+                    <details class="gallery-container">
+                        <summary>Click to expand image gallery of data visualizations - Log Transform of Average Donation Amount</summary>
+                        <section class="image-gallery">
+                            <h3>Log Transform of Average Donation Amount</h3>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/logDonatedDivTotalGifts/LogDonatedDivTotalGifts_boxplot.png" alt="LogDonatedDivTotalGifts boxplot">
+                                <figcaption>Boxplot representations of donors and their <strong>Log Transformed Average Donation Amount</strong></figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/logDonatedDivTotalGifts/LogDonatedDivTotalGifts_hist.png" alt="LogDonatedDivTotalGifts histogram">
+                                <figcaption>Histogram representations of donors and their <strong>Log Transformed Average Donation Amount</strong></figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/logDonatedDivTotalGifts/LogDonatedDivTotalGifts_kde.png" alt="LogDonatedDivTotalGifts KDE">
+                                <figcaption>KDE representations of donors and their <strong>Log Transformed Average Donation Amount</strong></figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/logDonatedDivTotalGifts/LogDonatedDivTotalGifts_rug.png" alt="LogDonatedDivTotalGifts rugplot">
+                                <figcaption>Rug representations of donors and their <strong>Log Transformed Average Donation Amount</strong></figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Univariate analysis/logDonatedDivTotalGifts/LogDonatedDivTotalGifts_violin.png" alt="LogDonatedDivTotalGifts violin">
+                                <figcaption>Violin representations of donors and their <strong>Log Transformed Average Donation Amount</strong></figcaption>
+                            </figure>
+                        </section>
+                    </details>
+                    <p>
+                        At this point, I am having a subtle realization just how many ways the data can be compared and interpreted. Wow.
+                    </p>
+                    <p>
+                        Though it is vast it is not limitless.
+                        Moreover, with our dataset there are several columns that are related to location or contact information
+                        that I do not suspect to be related to churn and can be excluded from comparison.
+                        I will focus on the following candidate fields:  <strong>EventParticipation</strong>, <strong>EngagementScore</strong>, <strong>EventParticipation</strong>,
+                        <strong>TotalAmountDonated</strong>, and <strong>TotalGifts</strong>.
+                    </p>
+
+                    <h3>Candidate fields</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                        <thead>
+                        <tr style="background-color: #f0f0f0;">
+                            <th style="padding: 0.5rem; border: 1px solid #ccc;">Variable</th>
+                            <th style="padding: 0.5rem; border: 1px solid #ccc;">Type</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr>
-                            <td>DaysSinceDonation</td>
-                            <td>Days since a donation</td>
+                            <td style="padding: 0.5rem; border: 1px solid #ccc;">EngagementScore</td>
+                            <td style="padding: 0.5rem; border: 1px solid #ccc;">Continuous</td>
                         </tr>
                         <tr>
-                            <td>EngagementScore</td>
-                            <td>0–100 point metric</td>
+                            <td style="padding: 0.5rem; border: 1px solid #ccc;">EventParticipation</td>
+                            <td style="padding: 0.5rem; border: 1px solid #ccc;">Boolean</td>
                         </tr>
                         <tr>
-                            <td>TotalGifts</td>
-                            <td>Integer counts (1–30+)</td>
+                            <td style="padding: 0.5rem; border: 1px solid #ccc;">TotalAmountDonated</td>
+                            <td style="padding: 0.5rem; border: 1px solid #ccc;">Continuous</td>
                         </tr>
                         <tr>
-                            <td>LogDonated</td>
-                            <td>Log-transformed dollars</td>
+                            <td style="padding: 0.5rem; border: 1px solid #ccc;">TotalGifts</td>
+                            <td style="padding: 0.5rem; border: 1px solid #ccc;">Continuous</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem; border: 1px solid #ccc;">LastDonationDate</td>
+                            <td style="padding: 0.5rem; border: 1px solid #ccc;">Continuous</td>
                         </tr>
                         </tbody>
                     </table>
-                </div>
-                </section>
-                <div class="lightbox-gallery">
-                    <img 
-                        src="../../assets/images/data_analysis_pictures/images/gippity/kmeans_clusters_pairplot.png"
-                        alt="Initial KMeans clustering"
-                        onclick="openLightbox(this)"
-                    />
-                    <p>
-                        After normalization I recieved much more workable data that reveals more interesting trends.
-                    </p>
-                    <table class="clustertable">
-                    <thead>
-                        <tr>
-                        <th>Cluster</th>
-                        <th>mean</th>
-                        <th>median</th>
-                        <th>mode</th>
-                        <!-- Add more feature columns as needed -->
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                        <td>0</td>
-                        <td>45.2</td>
-                        <td>38.0</td>
-                        <td>21</td>
-                        <!-- ... -->
-                        </tr>
-                        <tr>
-                        <td>1</td>
-                        <td>310.7</td>
-                        <td>300.0</td>
-                        <td>365</td>
-                        <!-- ... -->
-                        </tr>
-                        <tr>
-                        <td>2</td>
-                        <td>120.4</td>
-                        <td>125.0</td>
-                        <td>90</td>
-                        <!-- ... -->
-                        </tr>
-                    </tbody>
-
-                    </table>
-                    <p>
-                        It appears there are distinct clustering of datapoints where donors donate either frequently or infrequently correlating with increased 
-                        days since last donation compared to frequent donators. 
-                        This happens to be well correlated with normalized engagement scores.
-                        Zooming out, it would have real business applications for this organization if they realized this and could optimize engagement to 
-                        maintain a stable base of donors.
-                    </p>
+                    <h2>Data Analysis</h2>
                     <p class="shadow-block">
-                        <strong>
-                            These normalized k-means clustering graphs were created before I added in additional dimensions of zipcode or state which could cluster data 
-                            in other interesting ways for feature engineering consideration.
-                        </strong>
+                    <strong>
+                    I initially started with bivariate analysis but ended up with lots of very difficult to read data. So I went back to univariate analysis to try and understand the data better. I also took a very long time to create my representations because I was initially using matplotlib, using the internet I found that seaborn was great for visualizing data so I decided to switch to seaborn.
+                    </strong>
                     </p>
-                    <img
-                        src="../../assets/images/data_analysis_pictures/images/kmeans_clustered_pairplot_hist.png"
-                        alt="KMeans Clustered Pairplot"
-                        onclick="openLightbox(this)"
-                    />
+                    <p>
+                    I am approaching data analysis with a first principles mindset. I feel like a very useful heuristic in every discipline is to focus on foundations when it comes to projects.
+                    With machine learning being so extremely data-quality dependant I am being extra thorough and am willing to research methods beyond my experienced domain.
+                    </p>
+                </article>
+                <article class="blog-post">
+                    <h2>Bivariate Analysis</h2>
+                    <table border="1" cellspacing="0" cellpadding="6">
+                            <thead>
+                                <tr>
+                                <th>Plot Type</th>
+                                <th>Reason for Use</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                <td>Scatter</td>
+                                <td>Useful when variables are uniformly distributed. Highlights overall spread and independence; no clear directional trend suggests weak correlation.</td>
+                                </tr>
+                                <tr>
+                                <td>Hexbin</td>
+                                <td>Ideal for high-density or discrete data with many overlapping points. Reveals clustered structure in large datasets or blocky distributions.</td>
+                                </tr>
+                                <tr>
+                                <td>Joint</td>
+                                <td>Combines scatterplot with marginal histograms. Helps identify relationships while showing distributional structure of each variable.</td>
+                                </tr>
+                                <tr>
+                                <td>LOWESS</td>
+                                <td>Detects subtle or nonlinear trends in scatterplots. Useful when scatter looks flat but curvature or slope might exist.</td>
+                                </tr>
+                                <tr>
+                                <td>Linear</td>
+                                <td>Tests for global linear relationships between variables. Useful when the spread is uniform but correlation might exist.</td>
+                                </tr>
+                                <tr>
+                                <td>Residuals</td>
+                                <td>Displays deviations from linear predictions. Useful for diagnosing model fit, heteroscedasticity, or hidden patterns.</td>
+                                </tr>
+                                <tr>
+                                <td>KDE 2D</td>
+                                <td>Estimates the smooth density of two continuous variables. Ideal for visualizing structure in noisy or overlapping data.</td>
+                                </tr>
+                            </tbody>
+                    </table>
+                    <details class="gallery-container">
+                        <summary>Click to expand image gallery of data visualizations - Total Amount Donated ÷ Total Gifts</summary>
+                    
+                        <section class="image-gallery">
+                            <h3>Days Since Last Donation vs Log Transformed Average Donation Amounts</h3>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/DaysSinceDonation_vs_LogDonatedDivTotalGifts_hexbin.png" alt="Hexbin plot">
+                                <figcaption>hexbin</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/DaysSinceDonation_vs_LogDonatedDivTotalGifts_joint.png" alt="Joint plot">
+                                <figcaption>joint</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/DaysSinceDonation_vs_LogDonatedDivTotalGifts_kde2d.png" alt="KDE 2D plot">
+                                <figcaption>kde2d</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/DaysSinceDonation_vs_LogDonatedDivTotalGifts_linear.png" alt="Linear regression">
+                                <figcaption>linear</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/DaysSinceDonation_vs_LogDonatedDivTotalGifts_lowess.png" alt="LOWESS">
+                                <figcaption>lowess</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/DaysSinceDonation_vs_LogDonatedDivTotalGifts_residuals.png" alt="Residuals">
+                                <figcaption>residuals</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/DaysSinceDonation_vs_LogDonatedDivTotalGifts_scatter.png" alt="Scatterplot">
+                                <figcaption>scatter</figcaption>
+                            </figure>
+                        </section>
+                    </details>
+                    <details class="gallery-container">
+                    <summary>Click to expand image gallery of data visualizations - Total Amount Donated ÷ Total Gifts</summary>
+                        <section class="image-gallery">
+                        <h3>Engagement Score vs Days Since Last Donation</h3>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_DaysSinceDonation_hexbin.png" alt="Hexbin plot">
+                                <figcaption>hexbin</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_DaysSinceDonation_joint.png" alt="Joint plot">
+                                <figcaption>joint</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_DaysSinceDonation_linear.png" alt="Linear regression">
+                                <figcaption>linear</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_DaysSinceDonation_lowess.png" alt="LOWESS">
+                                <figcaption>lowess</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_DaysSinceDonation_residuals.png" alt="Residuals">
+                                <figcaption>residuals</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_DaysSinceDonation_scatter.png" alt="Scatterplot">
+                                <figcaption>scatter</figcaption>
+                            </figure>
+                        </section>
+                    </details>
+                        
+                    <details class="gallery-container">
+                    <summary>Click to expand image gallery of data visualizations - Total Amount Donated ÷ Total Gifts</summary>
+                        <section class="image-gallery">
+                        <h3>Engagement Score vs Log Transformed Average Donation Amounts</h3>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_LogDonatedDivTotalGifts_hexbin.png" alt="Hexbin plot">
+                                <figcaption>hexbin</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_LogDonatedDivTotalGifts_joint.png" alt="Joint plot">
+                                <figcaption>joint</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_LogDonatedDivTotalGifts_kde2d.png" alt="KDE 2D plot">
+                                <figcaption>kde2d</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_LogDonatedDivTotalGifts_linear.png" alt="Linear regression">
+                                <figcaption>linear</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_LogDonatedDivTotalGifts_lowess.png" alt="LOWESS">
+                                <figcaption>lowess</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_LogDonatedDivTotalGifts_residuals.png" alt="Residuals">
+                                <figcaption>residuals</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../../assets/images/data_analysis_pictures/images/Bivariate analysis/EngagementScore_vs_LogDonatedDivTotalGifts_scatter.png" alt="Scatterplot">
+                                <figcaption>scatter</figcaption>
+                            </figure>
+                        </section>
+                    </details>
+                    <div>
+                        <p>
+                            My bivariate analysis yielded little information. Every single comparison showed that all three categories of the data are unrelated.
+                        </p>
+
+                        <p>
+                            Instead of proceeding to multivariate analysis and feature establishment, I decided that it couldn’t be as simple as participation having a 1-1 correlation to donating and that the majority of people donate in small amounts.
+                            I decided to go back to the drawing board in terms of choosing which parameters to compare.
+                        </p>
+
+                        <p>
+                            I continued to exclude <strong>Donor ID</strong> as it was an arbitrary ID and inclusion of it may cause a model to learn a stochastic pattern that would improperly bias it.
+                            <strong>First name</strong>, <strong>last name</strong>, <strong>email</strong>, and <strong>phone</strong> were excluded for similar reasons.
+                        </p>
+
+                        <p>
+                            I decided to include <strong>zipcode</strong> and <strong>state</strong> as they could show different things.
+                            It could be possible that residents of one state benefit greatly from the organization.
+                            It could be possible that an outreach program in that state could be more effective and support increasing outreach efforts in other states.
+                            Whatever the resultant trends (if any) I believe it is worth a look.
+                        </p>
+
+                        <p>
+                            I am making a deliberate decision to seperate zipcode from state right now because zipcodes don’t necessarily always correlate to geography correctly as it is the distance from the nearest postal distribution center.
+                            There could hypothetically exist a series of zipcodes on the border of multiple states that would appear geographically far apart but actually be very close.
+                            Clustering data by zipcode may also yield different results than clustering by state.
+                        </p>
+
+                        <p>
+                            I also decided to investigate the skew of low donation amounts and find out if there are any trends in which donors donate more.
+                        </p>
+                        <p class="shadow-block">
+                        <strong>
+                            Unfortunately, I had missed major properties of the data and realized it very late.
+                        </strong>
+                        </p>
+                        <p>
+                        I realized that there are a couple trends I appeared to have missed when looking at the plots comparing engagement scores, days since donation, total donations divided by total gifts.                    
+                        </p>
                     </div>
-                        <!-- Lightbox Modal -->
-                        <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-                        <span class="lightbox-close" onclick="closeLightbox(event)">&times;</span>
-                        <img class="lightbox-content" id="lightbox-img" />
-                        <div id="lightbox-caption" class="lightbox-caption"></div>
+
+                    <div class="lightbox-gallery">
+                        <img
+                            src="../../assets/images/data_analysis_pictures/images/everythingLogtransformedPairplot.png"
+                            alt="Log Transformed Pairplot"
+                            onclick="openLightbox(this)"
+                        />
+
+                    </div>
+                    <!-- Lightbox Modal -->
+                    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+                    <span class="lightbox-close" onclick="closeLightbox(event)">&times;</span>
+                    <img class="lightbox-content" id="lightbox-img" />
+                    <div id="lightbox-caption" class="lightbox-caption"></div>
+                    </div>
+                    <p>
+                    I overlooked the fact that there are trends between log days since donations and log engagement score. There are also trends between log engagement score and log donated div total gifts. 
+                    </p>
+                </article>
+                <section>
+                    <h2>K - Means Clustering</h2>
+                    <section class="blog-post">
+                    <h2>Overview of K-Means Clustering</h2>
+
+                    <p><strong>K-means clustering</strong> is an a method used to partition data into <strong>K distinct groups</strong> (clusters) based on similarity.</p>
+
+                    <h3>How It Works</h3>
+                    <ol>
+                        <li>Initialize <strong>K</strong> centroids randomly.</li>
+                        <li>Assign each data point to the <strong>nearest centroid</strong>.</li>
+                        <li>Recalculate centroids as the <strong>mean</strong> of all assigned points.</li>
+                        <li>Repeat until assignments stabilize or a maximum number of iterations is reached.</li>
+                        <a href="https://www.geeksforgeeks.org/machine-learning/k-means-clustering-introduction/?utm_source=chatgpt.com" target="_blank">source</a>
+                    </ol>
+                    
+                    <h3>Use in Data Analysis</h3>
+                    <ul>
+                        <li><strong>Exploratory Data Analysis:</strong> Identifies natural groupings (e.g., donor segments).</li>
+                        <li><strong>Dimensionality Reduction Aid:</strong> Preprocessing step before visualization techniques like PCA or t-SNE.</li>
+                    </ul>
+                    
+                    <h3>Use in Machine Learning</h3>
+                    <ul>
+                        <li><strong>Customer Segmentation:</strong> Groups users by engagement or purchase history.</li>
+                        <li><strong>Anomaly Detection:</strong> Flags outliers based on distance from centroids.</li>
+                        <a href="https://www.simplilearn.com/tutorials/machine-learning-tutorial/k-means-clustering-algorithm?utm_source=chatgpt.com" target="_blank">source</a>
+                    </ul>
+
+                    <p>K-means is fast and interpretable but assumes spherical, similarly sized clusters and is sensitive to initial centroid placement.</p>
+                    
+                    <p> When looking back on this K-means clustering I performed very early, in my inexperience I overlooked the bottom clusters.
+                        I initially analyzed this image among many other graphs and after taking a look at the axises I mistakenly determined this as nonsensical grouping. 
+                        What I failed to realize is my lack of normalization was what caused the poor K-means clustering results.
+                    </p>
+                    <div class="blog-post__content">
+                        <p>The other features were not in units of days:</p>
+                        <table class="blog-table">
+                            <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Example Units</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>DaysSinceDonation</td>
+                                <td>Days since a donation</td>
+                            </tr>
+                            <tr>
+                                <td>EngagementScore</td>
+                                <td>0–100 point metric</td>
+                            </tr>
+                            <tr>
+                                <td>TotalGifts</td>
+                                <td>Integer counts (1–30+)</td>
+                            </tr>
+                            <tr>
+                                <td>LogDonated</td>
+                                <td>Log-transformed dollars</td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
                     </section>
-                    <article class="blog-post">
+                    <div class="lightbox-gallery">
+                        <img 
+                            src="../../assets/images/data_analysis_pictures/images/gippity/kmeans_clusters_pairplot.png"
+                            alt="Initial KMeans clustering"
+                            onclick="openLightbox(this)"
+                        />
+                        <p>
+                            After normalization I recieved much more workable data that reveals more interesting trends.
+                        </p>
+                        <table class="clustertable">
+                        <thead>
+                            <tr>
+                            <th>Cluster</th>
+                            <th>mean</th>
+                            <th>median</th>
+                            <th>mode</th>
+                            <!-- Add more feature columns as needed -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                            <td>0</td>
+                            <td>45.2</td>
+                            <td>38.0</td>
+                            <td>21</td>
+                            <!-- ... -->
+                            </tr>
+                            <tr>
+                            <td>1</td>
+                            <td>310.7</td>
+                            <td>300.0</td>
+                            <td>365</td>
+                            <!-- ... -->
+                            </tr>
+                            <tr>
+                            <td>2</td>
+                            <td>120.4</td>
+                            <td>125.0</td>
+                            <td>90</td>
+                            <!-- ... -->
+                            </tr>
+                        </tbody>
 
+                        </table>
+                        <p>
+                            It appears there are distinct clustering of datapoints where donors donate either frequently or infrequently correlating with increased 
+                            days since last donation compared to frequent donators. 
+                            This happens to be well correlated with normalized engagement scores.
+                            Zooming out, it would have real business applications for this organization if they realized this and could optimize engagement to 
+                            maintain a stable base of donors.
+                        </p>
+                        <p class="shadow-block">
+                            <strong>
+                                These normalized k-means clustering graphs were created before I added in additional dimensions of zipcode or state which could cluster data 
+                                in other interesting ways for feature engineering consideration.
+                            </strong>
+                        </p>
+                        <img
+                            src="../../assets/images/data_analysis_pictures/images/kmeans_clustered_pairplot_hist.png"
+                            alt="KMeans Clustered Pairplot"
+                            onclick="openLightbox(this)"
+                        />
+                    </div>
+                    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+                            <span class="lightbox-close" onclick="closeLightbox(event)">&times;</span>
+                            <img class="lightbox-content" id="lightbox-img" />
+                            <div id="lightbox-caption" class="lightbox-caption"></div>
+                    </div>
+                </section>
+                <article class="blog-post">
                     <p class="shadow-block">
                         <strong>
                             At this point I have already spent 11 hours on this and it's 8pm so I am going to start working on (this blog post) instead.
@@ -702,46 +733,46 @@
                             These small but educational upsets are what motivated me to pursue a project outside of my comfort zone.
                         </strong>
                     </p>
-                <h2>Temporal Normalization of Donations</h2>
+                    <h2>Temporal Normalization of Donations</h2>
+                    <p>
+                        Before I write a summary of today's endeavors another consideration I realized is that I need to normalize donations against their timescale.
+                        For example, in days since donation and donated divided by total gifts, it may appear like there is no meaningful recency bias — but this is not actually the case.
+                    </p>
 
-                <p>
-                    Before I write a summary of today's endeavors another consideration I realized is that I need to normalize donations against their timescale.
-                    For example, in days since donation and donated divided by total gifts, it may appear like there is no meaningful recency bias — but this is not actually the case.
-                </p>
-                <p>
-                    When comparing total donations to days since last donation, the total amount of people whose last donation occurred 1000 days ago
-                    cannot truly be equivalated to the total donation amount of customers who are still donating.
-                </p>
+                    <p>
+                        When comparing total donations to days since last donation, the total amount of people whose last donation occurred 1000 days ago
+                        cannot truly be equivalated to the total donation amount of customers who are still donating.
+                    </p>
 
-                <p>
-                    Various things can govern donation habits that are not recorded within the source CRM dataset.
-                    People who have recently started donating may donate small amounts at the beginning but ramp up over time and have yet to reach their maximum donation amount.
-                    This is not truly comparable to people who have already reached their peak and are no longer actively donating.
-                </p>
+                    <p>
+                        Various things can govern donation habits that are not recorded within the source CRM dataset.
+                        People who have recently started donating may donate small amounts at the beginning but ramp up over time and have yet to reach their maximum donation amount.
+                        This is not truly comparable to people who have already reached their peak and are no longer actively donating.
+                    </p>
 
-                <p>
-                    If we had snapshots of these donor profiles, we could likely perform some sort of time series analysis to better isolate populations.
-                    However, since this project is based off of a single snapshot of a CRM, we will instead either have to take our datapoints,
-                    assign an “activity weight” (possibly based off of the EngagementScore), and then either normalize the dataset and extrapolate from our limited dataset
-                    to determine hypothetical maximum donation amounts, or divide total donation amount by days since last donation
-                    to get some sort of strange variable of total donation amount based on time since last donation.
-                </p>
+                    <p>
+                        If we had snapshots of these donor profiles, we could likely perform some sort of time series analysis to better isolate populations.
+                        However, since this project is based off of a single snapshot of a CRM, we will instead either have to take our datapoints,
+                        assign an “activity weight” (possibly based off of the EngagementScore), and then either normalize the dataset and extrapolate from our limited dataset
+                        to determine hypothetical maximum donation amounts, or divide total donation amount by days since last donation
+                        to get some sort of strange variable of total donation amount based on time since last donation.
+                    </p>
 
-                <p>
-                    Hmm… that is actually terrible. A better metric would be to do total gift amount.
-                    Actually, that falls to the same pitfalls of us not actually having any history to understand the donor behaviors.
-                </p>
+                    <p>
+                        Hmm… that is actually terrible. A better metric would be to do total gift amount.
+                        Actually, that falls to the same pitfalls of us not actually having any history to understand the donor behaviors.
+                    </p>
 
-                <p>
-                    Including features transformed as such could reveal trends, but I will not use these bad metrics of total amount
-                    or total gift divided by days since last donation, since it would contaminate the data.
-                    They don’t represent actual relationships that would meaningfully predict things and may skew our model.
-                </p>
+                    <p>
+                        Including features transformed as such could reveal trends, but I will not use these bad metrics of total amount
+                        or total gift divided by days since last donation, since it would contaminate the data.
+                        They don’t represent actual relationships that would meaningfully predict things and may skew our model.
+                    </p>
 
-                <p>
-                    It is likely best to use days since last donation to normalize every single datapoint relative to the oldest last donation.
-                    This, in combination with other metrics, could reveal more clusters alongside our engagement scores.
-                </p>
+                    <p>
+                        It is likely best to use days since last donation to normalize every single datapoint relative to the oldest last donation.
+                        This, in combination with other metrics, could reveal more clusters alongside our engagement scores.
+                    </p>
                 </article>
                 <article class="blog-post">
                     <h1>Day 2 Summary — Feature Engineering & Data Analysis</h1>
@@ -780,17 +811,15 @@
                         <p><strong>Day 2 Reflection:</strong> So there we have it, "Feature Engineering." I expected rigirous data analysis would be involved with data pipelining. However, with such a clean dataset and so few parameters, I did couldn't have imagined the complexity of the project. 
                             Progress was slower than expected, but foundational understanding and corrections were enlightening.</p>
                     </div>
-                    </article>
-        </div>
-
-        <footer class="blog-post__footer">
-            <a href="../../blog.html" class="blog-post__back-link">← Back to Blog</a>
-        </footer>
+                </article>
+            </div>
         </article>
-
-  </main>
-  <div data-include="../../partials/footer.html"></div>
-  <script src="../../assets/js/include.js"></script>
-  <script src="../../assets/js/lightbox.js"></script>
+    </main>
+    <footer class="blog-post__footer">
+        <a href="../../blog.html" class="blog-post__back-link">← Back to Blog</a>
+        <div data-include="../../partials/footer.html"></div>
+    </footer>
+    <script src="../../assets/js/include.js"></script>
+    <script src="../../assets/js/lightbox.js"></script>
 </body>
 </html>
