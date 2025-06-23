@@ -6,6 +6,53 @@
   <title>Blog</title>
   <link rel="stylesheet" href="../assets/css/style.css" />
   <link rel="stylesheet" href="../assets/css/blog.css" />
+  <style>
+    .blog-post {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      text-align: initial; /* Undo text centering for body text */
+    }
+
+    /* Central sticky container without scroll bar */
+    .scroll-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #fff;
+      position: sticky;
+      top: 2rem;
+      border-radius: 0.5rem;
+    }
+
+    /* Center align headings and images only */
+    .blog-post h1,
+    .blog-post h2,
+    .blog-post__content img {
+      text-align: center;
+    }
+
+    .blog-post__header,
+    .blog-post__content,
+    .blog-post__footer {
+      margin-bottom: 1.5rem;
+    }
+
+    .blog-post__content img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 1rem auto;
+    }
+
+    .blog-post__back-link {
+      display: inline-block;
+      margin-top: 1rem;
+      text-decoration: none;
+    }
+
+
+  </style>
 </head>
 <body>
     <div data-include="../partials/header.html"></div>
