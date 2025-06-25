@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Project Start — Customer Relations Churn Rate</title>
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <link rel="stylesheet" href="../../assets/css/blog.css" />
+</head>
+<body>
+  <div data-include="../../partials/blog_header.html"></div>
+    <main>
+        <article class="blog-post">        
+        <div class="scroll-container">
+            <article><h1>Project Day 3 - Data Analysis Approach Shift</h1>
+            <p>
+                I went back to the drawing board and researched a couple methods on how feature engineering is accomplished.
+            </p>
+            <p>
+                I knew that KMeans analysis is a common method but I wanted to research other methods to reduce the chances of missing
+                a trend hidden in the data.
+            </p>
+            <p>Here were a couple of things that I wanted to know:</p>
+            <ul>
+                <li>
+                    Why was there a small island around 8-10 Log(TotalAmountDonated) when plotting Log(TotalAmountDonated) divided by total_gifts
+                </li>
+                <li>
+                    High average donations and low average donations seem to be clustered differently from intermediate levels of donations,
+                    when normalized for time scale (by extrapolating to the max days since donation datapoint) would this change? Subsequently,
+                    can the group of donors who donate a very high average amount per gift be further stratified to reveal those who 
+                    will continue to donate vs stop donating?
+                </li>
+                <li>
+                    How might I combine categorical 'ZipCode' data with 'State' data to see if donors within states can be
+                    stratified? 
+                </li>
+                <li>
+                    Were there any other clusters of data that I could analyze besides the above?
+                </li>
+            </ul>
+            <p>
+                Here are some thoughts going through my head as I enter this day of data analysis:
+            </p>
+            <ul>
+                <li>
+                    Right now my approach has been analyzing the data to better guide how I want to set
+                    my criteria for "churned." But what if I arbitrarily determine donor churn as a last donation of greater than 1000 days?
+                </li>
+                <li>
+                    Visualization of data and analysis via visualization has been very slow.
+                    Switching to using metrics or indicies would likely be more efficient and accurate.
+                </li>
+            </ul>
+            <p>
+                I thought it would be best if I explore methods of how to represent a KMeans clustering's predictive value and
+                stumbled upon the following metrics:
+            </p>
+            <h3>Inertia</h3>
+            <p>
+            Used in the <strong>Elbow Method</strong>, inertia is a measure of within-cluster sum of squared distances. 
+            Which is the distance to their nearest centroid. Inertia essentially is a metric measuring tightness of fit.
+            </p>
+
+            <p>
+                The <strong>Elbow Method</strong> is a method of plotting inertia to see where diminishing returns in adding clusters
+                exist. If plotting variables from n=3 to n=12 clusters results in an inertia graph that sharply increases
+                from n=5 clusters to n=7 clusters and then marginally increases until 12 clusters, then it may show that anything past 7
+                clusters creates unstable clusters or overfitting clusters.
+            </p>
+            
+            <h3>Silhouette Score</h3>
+            <p>
+                The silhouette coefficient meaures how well separated clusters are. It's a comparison between the average distances of each cluster's points to their cluster versus the
+                average distance to other clusters. 
+            </p>
+            
+            <p>
+                This is another metric for determining tightness of clustering but also more specifically how well separated clusters are from eachother.
+            </p>
+            <p>
+                The specific drawbacks include the undervaluing of valid cluster structures. Silhouette score does not account for how varying cluster structure
+                may actually impart meaning. If one cluster is more diffuse than another but that diffusion is due to a property of the cluster then this score may 
+                not be as valid. This is a problem inherited from the nature of kmeans analysis assuming roughly equal variance of clusters but is worth mentioning
+                because using only silhouette score would exacerbate this bias.
+            </p>
+
+            <h3>Calinski-Harabasz Index</h3>
+            <p>
+                The Calinski-Harabasz Index (CH index) measures the <strong>Variance Ratio Criterion</strong>.
+                This is the ratio of between-cluster dispersion to within-cluster dispersion. Similar to silhouette score
+                but a more direct comparison of how spread out cluster to cluster our data are versus how spread out within each cluster our data are.
+            </p>
+            <p>
+                The CH index is also used for finding the optimal number of clusters and favors solutions where clusters are of balanced size and density.
+            </p>
+            <p>
+                Similar to silhouette score's limitations it assumes compact globular clustes which may not be ideal if clusters are non-spherical or unequal in size.
+                If for instance we had 3 exceptionally meaningful and well grouped clusters at n=4 clusters and one oblong and spread out clusterm, it could
+                falsely depress the predictive value of that kmeans clustering.
+            </p>
+            <p>
+                Use of the CH index with other metrics can reduce the liklihood of chasing numerical artifacts in the data.
+            </p>
+            
+            <h3>Davies-Bouldin Index</h3>
+            <p>
+                The Davies-Bouldin Index (DBI) is a metric focusing on cluster separation relative to size. It calculates the 
+                similarity of clusters to other clusters as defined by the ratio of the cluster's <strong>average scatter</strong>. 
+                It is the average of the worst-case similarity values over all clusters.
+            </p>
+            <p>
+                The DBI makes no distributional assumptions as strongly as sillhouette or CH index does. 
+                It is particularily suited for if overlapping clusters are produced. 
+            </p>
+            <p>
+                DBI has drawbacks in that it may cause an overestimate for the optimal clusters. It favors situations
+                where kmeans splits one awkward cluster into two tighter clusters even if there is no substantive predictive
+                value in doing so.
+            </p>
+            
+            <h2>Revisions in my approach</h2>
+            <p>
+                My previous methadology was centered around my inexperience with data engineering and data analysis.
+                I've been less iterative and methodical about my approaches as I have been trying to gain an intuition for 
+                a good process for data analysis. With this process of learning and exploring comes mistakes and inefficiencies.
+                Now that I understand more about both data analysis and the data that I have,
+                I have more confidence in approaching this from a different angle.
+            </p>
+            <p>
+                Before, I was really worried about picking the wrong features and then having my incorrect selection impact my overall
+                feature design. Now that I have a better understanding of the tools at my disposal I have devised a plan.
+            </p>
+            <p>
+                Instead of having data clustering determine the features I select, I am going to think hard about how variables
+                are related to eachother and clustering hypothetical features. Previously I had been too hesitant to devise features to 
+                analyze that I have been trying to exhaustively represent every possible permutation of kmeans clustering. 
+            </p>
+            <p>
+                I made a script that created clusterings for every combination of data in my dataframe. This is not efficient nor 
+                insightful as I have no reason to compare fields such as log(TotalAmountDonated) vs log(TotalAmountDonatedvsTotalGifts).
+            </p>
+            <p>
+                With the many dimensions that the data could be represented I have been stuck in a sort of analysis paralysis.
+            </p>
+            <p>
+                From now on:
+            </p>
+            <ul>
+                <li>
+                    I will determine relavent columns to compare within kmeans clustering
+                </li>
+                <li>
+                    I will not endeavor to exhaustively identify every possible clustering of data to see if it represents anything useful.
+                </li>
+                <li>
+                    I will probably start by investigating fundamental heuristics used in grouping data such as identi
+                </li>
+                <li>
+                    I will incorporate categorical geographic data into the analysis
+                </li>
+            </ul>
+            <p>
+                We can't really make any assumptions about rates of donations or scaling donations relative to time since we don't have 
+                any data that can reliably predict this. I was thinking about normalizing the data with respect to days since last donation 
+                but the predictive value is rather low in my current opinion. Since our CRM is only one temporal data point it is possible that everyone who donated 
+                1000 days ago donated their amounts as a lump sum. We also can't compare total amount donated over the time since last donation
+                since that doesn't give us any information about the trend of whether they will donate more or not. 
+            </p>
+            <p>
+                It is at this point I want to start looking inside some of these variables and group them by geographic location to see if any meaningful trends
+                can be identified based on geography.
+            </p>
+            <p>
+                I also have made a mistake in prior sampling since I assumed that the total amount donated divided by total gifts would yield 
+                the average amount donated. This is not the case. Since not all donors have greater than 30 donations. Recalling the Central Limit
+                Theorum, we can't actually assume that it would be the true average amount a donor would donate. Or at least if this assumption is made then
+                it must be made carefully.
+            </p>
+            <p> 
+                For now, because the number of features we have and the dimensionality of our data is rather low I will exclude total gift donation from being compared 
+                to total gifts. 
+            </p>
+            <p>
+                I forgot that since I only care about people who donate I need to remove those who do not donate when doing the continued analysis wait no ok that sucks I just realized 
+                that my pipeline was not converting values correctly and people who did not donate were being marked as having donated.
+            </p>
+            </article>
+        </div>
+        </article>
+    </main>
+    <footer class="blog-post__footer">
+        <a href="../../blog.html" class="blog-post__back-link">← Back to Blog</a>
+        <div data-include="../../partials/footer.html"></div>
+    </footer>
+    <script src="../../assets/js/include.js"></script>
+    <script src="../../assets/js/lightbox.js"></script>
+</body>
+</html>
