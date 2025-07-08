@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Project Start — Customer Relations Churn Rate</title>
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <link rel="stylesheet" href="../../assets/css/blog.css" />
+</head>
+<body>
+  <div data-include="../../partials/blog_header.html"></div>
+    <main>
+        <article class="blog-post">        
+        <div class="scroll-container">
+            <h1>
+                Principal Component Analysis
+            </h1>
+            <article>
+                <p>
+                    I took a little vacation to go to a wedding, my friend got married in Michigan so I took a bit of a break.
+                    With renewed vigor I decided to consult the great world wide web for some insight on how to continue with my analysis.
+                    Using the scatter plot as I have been with my grouped features and clustering the scaled features seemed to be very slow. 
+                    Doing this for 50 states and 2-13 clusters is very time consuming when analyzing.
+                </p>
+                <p>
+                    I went a step back and used a script to automate the kmeans clustering and created a scaled metric to evaluate
+                    the best clustering. This assumes my features are roughly linear which is a bold assumption. I think there is still room for exploring
+                    bands of donors, such as seperating donors who donate more than 5000 from those who donate less than 5000. 
+                </p>
+                <o>
+                    For now I want to proceed with a quick decision so I can get a prototype rolling. I decided to use principal component analysis
+                    to reduce the amount of dimensions in my data. Using a T-SNE plot over all 50 states, I realize now that there is a very clear seperation between certain data.
+                    I previously excluded using clustering of k = 2 which I now realize is a mistake. My clustering script also had a drawback of being 
+                    biased towards higher clustering counts. I adjusted the script such that it only performs kmeans on PCA'd data from k=2 clusters to k=8 clusters.
+                    This gave much better clustering data and I am more confident that these PCA'd features actually result from measurable donor features rather than numerical artifacts. 
+                </o>
+            </article>
+        </div>
+        </article>
+    </main>
+    <footer class="blog-post__footer">
+        <a href="../../blog.html" class="blog-post__back-link">← Back to Blog</a>
+        <div data-include="../../partials/footer.html"></div>
+    </footer>
+    <script src="../../assets/js/include.js"></script>
+    <script src="../../assets/js/lightbox.js"></script>
+</body>
+</html>
