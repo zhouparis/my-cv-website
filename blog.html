@@ -51,8 +51,49 @@
       text-decoration: none;
     }
 
+    .blog-list {
+      width: clamp(320px, 90vw, 960px);  /* fixed size relative to page */
+      margin: 2rem auto;                 /* centers the whole section */
+      padding: 0 1rem;
+    }
+    .post-dropdown {
+      width: 100%;                       /* fills the centered .blog-list width */
+      box-sizing: border-box;
+      margin: 1rem auto;                 /* stays centered */
+      border: 1px solid #e5e5e5;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: #fff;
+    }
+    summary {
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1.05rem;
+        list-style: none;
+      }
 
-  </style>
+      /* Hide default marker (Chrome/Safari) */
+      .post-dropdown summary::-webkit-details-marker {
+        display: none;
+      }
+
+      /* Add a dropdown caret */
+      .post-dropdown summary::after {
+        content: "▴";
+        float: left;
+      }
+
+      .post-dropdown[open] summary::after {
+        content: "▾";
+      }
+
+      .post-list {
+        margin: 0.75rem 0 0 1.25rem;
+        padding: 0;
+      }
+
+
+</style>
 </head>
 <body>
     <div data-include="../partials/header.html"></div>
@@ -61,24 +102,71 @@
   <main>
     <section class="blog-list">
       <h2>Recent Posts</h2>
-      <ul>
-        <li>
-          <a href="https://zhouparis.github.io/my-cv-website/blog_posts/Customer_Relations_Churnrate_ML/project_day3+1.html">Data Pipeline Contamination Post Mortem</a>
-          — June 24, 2025
-        </li>
-        <li>
-          <a href="https://zhouparis.github.io/my-cv-website/blog_posts/Customer_Relations_Churnrate_ML/project_day3.html">Data Analysis Approach Shift</a>
-          — June 24, 2025
-        </li>
-        <li>
-          <a href="https://zhouparis.github.io/my-cv-website/blog_posts/Customer_Relations_Churnrate_ML/project_day2.html">Feature Engineering</a>
-          — June 22, 2025
-        </li>
-        <li>
-          <a href="https://zhouparis.github.io/my-cv-website/blog_posts/Customer_Relations_Churnrate_ML/project_start.html">Data Pipelining</a>
-          — June 21, 2025 - Will fix
-        </li>
-      </ul>
+
+      <details class="post-dropdown" open>
+        <summary>Machine Learning</summary>
+        <ul class="post-list">
+          <li>
+            <a href="https://zhouparis.github.io/my-cv-website/blog_posts/MachineLearning/intro_ML.html">
+              Intro to Machine Learning
+            </a>
+          </li>
+        </ul>
+      </details>
+
+      <details class="post-dropdown">
+        <summary>Math</summary>
+
+        <details class="post-subdropdown" open>
+          <summary>Linear Algebra</summary>
+          <ul class="post-list">
+            <li>
+              <a href="https://zhouparis.github.io/my-cv-website/blog_posts/Math/Linear_Algebra/Vectors.html">
+                Vectors
+              </a>
+            </li>
+            <li>
+              <a href="https://zhouparis.github.io/my-cv-website/blog_posts/Math/Linear_Algebra/Matrices.html">
+                Matrices
+              </a>
+            </li>
+            <li>
+              <a href="https://zhouparis.github.io/my-cv-website/blog_posts/Math/Linear_Algebra/span.html">
+                Span + Linear Combination
+              </a>
+            </li>
+            <li>
+              <a href="https://zhouparis.github.io/my-cv-website/blog_posts/Math/Linear_Algebra/subspace.html">
+                Subspace
+              </a>
+            </li>
+          </ul>
+        </details>
+
+        <details class="post-subdropdown">
+          <summary>Convex Optimization</summary>
+          <ul class="post-list">
+            <!-- Add posts here -->
+            <!-- <li><a href="...">Topic</a></li> -->
+          </ul>
+        </details>
+
+        <details class="post-subdropdown">
+          <summary>Probability</summary>
+          <ul class="post-list">
+            <!-- Add posts here -->
+          </ul>
+        </details>
+
+        <details class="post-subdropdown">
+          <summary>Multivariate Calculus</summary>
+          <ul class="post-list">
+            <!-- Add posts here -->
+          </ul>
+        </details>
+
+      </details>
+
     </section>
   </main>
 
